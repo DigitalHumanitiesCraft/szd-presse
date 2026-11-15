@@ -16,7 +16,9 @@ What the instrument does and under which constraints it was built.
 
 ## Requirements
 
-- One view, one figure, no navigation and no tutorial. The before and after of modelling is one figure with a switch: Catalogue (one row per written string) and Model (one row per periodical). The dots move between the two states.
+- A research tool that carries catalogue data into a modelled schema, in two parts on one dataset and one figure: Model (rows are the catalogue lines with the rules' proposals, the place where joins are decided) and Explore (rows are the modelled periodicals by year). The same marks move between the two parts. Deciding in the mask (confirm, reject, change, by a named person) is planned in [plan.md](plan.md), not built.
+- The output is the product: `docs/data/export/` holds the modelled clippings and a register of periodicals as CSV and JSON, with licence, written by `scripts/export.py`; the Data menu offers them.
+- Every mark shows its status. Today every statement is a proposal by rule; the key carries the confirmed state (ringed mark) with "none yet".
 - Every number on the page is computed from the data by code; `tests/test_model.py` fails when parser or joins change the counts.
 - Unparsed, book and missing references are counted and shown as their own group.
 - A click on a dot shows the facsimile, the signature, the original catalogue line next to the modelled fields, the decisions taken on it and the status "machine-parsed, not verified". A click on a row shows every written title and place form the join merged, with the rule or reason.
@@ -29,7 +31,8 @@ Historians who plan an edition of periodicals and organisational records across 
 
 ## Range of functions
 
-- Mode switch Catalogue and Model, animated unless reduced motion is requested.
+- Part switch Model and Explore, animated unless reduced motion is requested.
+- Data menu with the four downloads and their licence.
 - Two prepared cases in the side panel: Frankfurter Zeitung (four place forms, one newspaper) and Der Morgen (one title, two periodicals).
 - Row panel, item panel with facsimile, remainder list of all further periodicals, not-read list.
 - Arrow keys move over the dots, Enter opens, Escape returns to the overview.

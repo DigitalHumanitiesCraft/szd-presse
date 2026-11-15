@@ -1,6 +1,6 @@
 # Zweig Press Clippings
 
-One instrument that shows what modelling does to a source collection. Stefan Zweig kept a collection of press clippings, catalogued by the Literaturarchiv Salzburg with one line of free text for where each piece appeared. The page shows the same clippings once grouped by those catalogue spellings and once grouped by periodicals modelled with place and date, and it shows every join and every line it does not read.
+A research tool that carries catalogue data into a modelled schema. Stefan Zweig kept a collection of press clippings, catalogued by the Literaturarchiv Salzburg with one line of free text for where each piece appeared. In the part Model, stated rules propose how these lines join into periodicals with place and date, and every join, every inference and every line left unread is shown. In the part Explore, the modelled clippings are shown by periodical and year. The modelled data and a register of the periodicals can be downloaded; every statement in them is a proposal by rule until a person confirms it.
 
 ## Run locally
 
@@ -15,6 +15,7 @@ Then open http://localhost:8731/.
 ```bash
 python scripts/extract.py data/source_aufsatzablage_tei.xml data/records.json
 python scripts/model.py data/records.json data/aliases.json docs/img docs/data/clippings.json
+python scripts/export.py docs/data/clippings.json docs/data/export
 python -m pytest tests
 ```
 

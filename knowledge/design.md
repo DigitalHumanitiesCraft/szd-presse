@@ -41,6 +41,11 @@ A specialised instrument for one question, made to be read from the back of a ro
 
 `tools/check_ui_density.cjs` (copied unchanged from `pruefansicht`), profile `work`, entry view: wide passes at the limits for text styles and text elements; narrow passes.
 
+## Status in the marks
+
+Filled mark: proposal by rule. Ringed mark (filled with an outer ring): confirmed by a person; none exist yet, the key says so. Dashed outline: not placed (book reference, line not parsed, no publication line). Selection: accent ring. The three must never share a form.
+
 ## Operator feedback
 
 - 2026-11-15, relayed by the Research Coordination, verbatim: „Dann würden wir diesen Prototypen gleich auf die erste Folie nach der Vorstellung von mir und DHCraft als Screenshot und mit einem GitHub Pages Link zu einem fertigen Tool. Und das muss wie das GOSSIP Tool oder CorrespExplorer sein? Eben nur spezialisiert und innovativ und fertig ausgebaut“. Maps to yardstick rule 31 (family header and footer). Status: addressed in the first build, not yet seen by the operator.
+- 2026-11-15, relayed by the Research Coordination, verbatim: „Man möchte nicht vor und nach dem Modellieren haben, sondern man möchte eigentlich ein Werkzeug haben, um die Daten in das modellierte Schema zu überführen. damit ich da mit den modellierten Daten arbeiten kann“ and „Das heißt, wir haben ein Tool mit zwei Ansichten: einer Dateneingabeansicht und einer Ansicht zur Analyse.“ Maps to yardstick rule 39 (views by the subject people work with). Status: reframed as Model and Explore with export in this build; the mask with decisions is planned in plan.md.

@@ -1,0 +1,935 @@
+{
+ "licence": "Derived from the catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg, CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/). Machine-parsed proposals, not verified.",
+ "rows": [
+  {
+   "periodical_id": "neue-freie-presse--wien",
+   "label": "Neue Freie Presse",
+   "place": "Wien",
+   "clippings": 82,
+   "catalogue_title_forms": "Neue Freie Presse (82)",
+   "catalogue_place_forms": "Wien (81) | (no place) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "berliner-tageblatt--berlin",
+   "label": "Berliner Tageblatt",
+   "place": "Berlin",
+   "clippings": 30,
+   "catalogue_title_forms": "Berliner Tageblatt (29) | Berliner Tagblatt (1)",
+   "catalogue_place_forms": "Berlin (29) | (no place) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "literarische-echo--berlin",
+   "label": "Das literarische Echo",
+   "place": "Berlin",
+   "clippings": 11,
+   "catalogue_title_forms": "Das literarische Echo (7) | Das Literarische Echo (4)",
+   "catalogue_place_forms": "Berlin (11)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "frankfurter-zeitung--frankfurt-am-main",
+   "label": "Frankfurter Zeitung",
+   "place": "Frankfurt am Main",
+   "clippings": 11,
+   "catalogue_title_forms": "Frankfurter Zeitung (11)",
+   "catalogue_place_forms": "(no place) (1) | Frankfurt am Main (1) | Frankfurt a. M. (6) | Frankfurt (3)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "neue-rundschau--berlin",
+   "label": "Die Neue Rundschau",
+   "place": "Berlin",
+   "clippings": 7,
+   "catalogue_title_forms": "Neue Rundschau (3) | Die Neue Rundschau (4)",
+   "catalogue_place_forms": "Berlin (7)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "zeit--wien",
+   "label": "Die Zeit",
+   "place": "Wien",
+   "clippings": 7,
+   "catalogue_title_forms": "Die Zeit (7)",
+   "catalogue_place_forms": "Wien (7)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "ipziger-tageblatt--leipzig",
+   "label": "Leipziger Tageblatt",
+   "place": "Leipzig",
+   "clippings": 6,
+   "catalogue_title_forms": "Leipziger Tageblatt (6)",
+   "catalogue_place_forms": "Leipzig (6)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "neue-hamburger-zeitung--hamburg",
+   "label": "Neue Hamburger Zeitung",
+   "place": "Hamburg",
+   "clippings": 6,
+   "catalogue_title_forms": "Neue Hamburger Zeitung (6)",
+   "catalogue_place_forms": "Hamburg (5) | (no place) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "vossische-zeitung--berlin",
+   "label": "Vossische Zeitung",
+   "place": "Berlin",
+   "clippings": 6,
+   "catalogue_title_forms": "Vossische Zeitung (6)",
+   "catalogue_place_forms": "Berlin (6)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "national-zeitung--basel",
+   "label": "National-Zeitung",
+   "place": "Basel",
+   "clippings": 5,
+   "catalogue_title_forms": "National-Zeitung (4) | Nationalzeitung (1)",
+   "catalogue_place_forms": "Basel (5)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "neue-zurcher-zeitung--zurich",
+   "label": "Neue Zürcher Zeitung",
+   "place": "Zürich",
+   "clippings": 5,
+   "catalogue_title_forms": "Neue Zürcher Zeitung (5)",
+   "catalogue_place_forms": "Zürich (5)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "allgemeine-zeitung--munchen",
+   "label": "Allgemeine Zeitung",
+   "place": "München",
+   "clippings": 4,
+   "catalogue_title_forms": "Allgemeine Zeitung (4)",
+   "catalogue_place_forms": "München (3) | München (Beilage) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "magazin-fur-literatur--berlin",
+   "label": "Das Magazin für Litteratur",
+   "place": "Berlin",
+   "clippings": 4,
+   "catalogue_title_forms": "Das Magazin für Litteratur (3) | Das Magazin für Literatur (1)",
+   "catalogue_place_forms": "Berlin (4)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "zukunft--berlin",
+   "label": "Die Zukunft",
+   "place": "Berlin",
+   "clippings": 4,
+   "catalogue_title_forms": "Die Zukunft (4)",
+   "catalogue_place_forms": "Berlin (4)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "pester-lloyd--budapest",
+   "label": "Pester Lloyd",
+   "place": "Budapest",
+   "clippings": 4,
+   "catalogue_title_forms": "Pester Lloyd (4)",
+   "catalogue_place_forms": "Budapest (4)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "reclams-universum--leipzig",
+   "label": "Reclams Universum",
+   "place": "Leipzig",
+   "clippings": 4,
+   "catalogue_title_forms": "Reclams Universum (3) | Reclam Universum (1)",
+   "catalogue_place_forms": "Leipzig (4)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "vom-fels-zum-meer--berlin",
+   "label": "Vom Fels zum Meer",
+   "place": "Berlin",
+   "clippings": 4,
+   "catalogue_title_forms": "Vom Fels zum Meer (4)",
+   "catalogue_place_forms": "Berlin (4)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "lesezirkel--zurich",
+   "label": "Der Lesezirkel",
+   "place": "Zürich",
+   "clippings": 3,
+   "catalogue_title_forms": "Der Lesezirkel (2) | Der Lesezirken (1)",
+   "catalogue_place_forms": "Zürich (2) | Zürich/Hottingen (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "merker--wien",
+   "label": "Der Merker",
+   "place": "Wien",
+   "clippings": 3,
+   "catalogue_title_forms": "Der Merker (2) | Merker (1)",
+   "catalogue_place_forms": "Wien (3)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "literarische-welt--berlin",
+   "label": "Die literarische Welt",
+   "place": "Berlin",
+   "clippings": 3,
+   "catalogue_title_forms": "Die literarische Welt (2) | Die Literarische Welt (1)",
+   "catalogue_place_forms": "Berlin (3)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "neues-wiener-journal--wien",
+   "label": "Neues Wiener Journal",
+   "place": "Wien",
+   "clippings": 3,
+   "catalogue_title_forms": "Neues Wiener Journal (3)",
+   "catalogue_place_forms": "Wien (3)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "neues-wiener-tagblatt--wien",
+   "label": "Neues Wiener Tagblatt",
+   "place": "Wien",
+   "clippings": 3,
+   "catalogue_title_forms": "Neues Wiener Tagblatt (3)",
+   "catalogue_place_forms": "(no place) (2) | Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "beilage-des-berliner-borsen-couriers--berlin",
+   "label": "Beilage des Berliner Börsen-Couriers",
+   "place": "Berlin",
+   "clippings": 2,
+   "catalogue_title_forms": "Beilage des Berliner Börsen-Couriers (2)",
+   "catalogue_place_forms": "Berlin (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "friedens-warte--berlin",
+   "label": "Die Friedens-Warte",
+   "place": "Berlin",
+   "clippings": 2,
+   "catalogue_title_forms": "Die Friedens-Warte (2)",
+   "catalogue_place_forms": "Berlin (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "literatur--stuttgart",
+   "label": "Die Literatur",
+   "place": "Stuttgart",
+   "clippings": 2,
+   "catalogue_title_forms": "Die Literatur (2)",
+   "catalogue_place_forms": "Stuttgart (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "nation--berlin",
+   "label": "Die Nation",
+   "place": "Berlin",
+   "clippings": 2,
+   "catalogue_title_forms": "Die Nation (2)",
+   "catalogue_place_forms": "Berlin (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "republik--berlin",
+   "label": "Die Republik",
+   "place": "Berlin",
+   "clippings": 2,
+   "catalogue_title_forms": "Die Republik (2)",
+   "catalogue_place_forms": "Berlin (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "ipziger-neueste-nachrichten--leipzig",
+   "label": "Leipziger Neueste Nachrichten",
+   "place": "Leipzig",
+   "clippings": 2,
+   "catalogue_title_forms": "Leipziger Neueste Nachrichten (2)",
+   "catalogue_place_forms": "Leipzig (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "mitteilungsblatt-des-hilfsvereins-deutschsprechender-juden--buenos-aires",
+   "label": "Mitteilungsblatt des Hilfsvereins deutschsprechender Juden",
+   "place": "Buenos Aires",
+   "clippings": 2,
+   "catalogue_title_forms": "Mitteilungsblatt des Hilfsvereins deutschsprechender Juden (2)",
+   "catalogue_place_forms": "Buenos Aires (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "munchner-neueste-nachrichten--munchen",
+   "label": "Münchner Neueste Nachrichten",
+   "place": "München",
+   "clippings": 2,
+   "catalogue_title_forms": "Münchner Neueste Nachrichten (2)",
+   "catalogue_place_forms": "München (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "prager-tagblatt--prag",
+   "label": "Prager Tagblatt",
+   "place": "Prag",
+   "clippings": 2,
+   "catalogue_title_forms": "Prager Tagblatt (2)",
+   "catalogue_place_forms": "Prag (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "uhu--berlin",
+   "label": "Uhu",
+   "place": "Berlin",
+   "clippings": 2,
+   "catalogue_title_forms": "Uhu (1) | Uhu. Neue Monatshefte (1)",
+   "catalogue_place_forms": "Berlin (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "osterreichische-rundschau--wien",
+   "label": "Österreichische Rundschau",
+   "place": "Wien",
+   "clippings": 2,
+   "catalogue_title_forms": "Österreichische Rundschau (2)",
+   "catalogue_place_forms": "Wien (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "aufbau--new-york",
+   "label": "Aufbau",
+   "place": "New York",
+   "clippings": 1,
+   "catalogue_title_forms": "Aufbau (1)",
+   "catalogue_place_forms": "New York (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "badische-presse-und-handelszeitung--karlsruhe",
+   "label": "Badische Presse und Handelszeitung",
+   "place": "Karlsruhe",
+   "clippings": 1,
+   "catalogue_title_forms": "Badische Presse und Handelszeitung (1)",
+   "catalogue_place_forms": "Karlsruhe (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "belletristisch-literarische-beilage-der-hamburger-nachrichten--hamburg",
+   "label": "Belletristisch-Literarische Beilage der Hamburger Nachrichten",
+   "place": "Hamburg",
+   "clippings": 1,
+   "catalogue_title_forms": "Belletristisch-Literarische Beilage der Hamburger Nachrichten (1)",
+   "catalogue_place_forms": "Hamburg (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "berliner-borsen-courier--berlin",
+   "label": "Berliner Börsen-Courier",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Berliner Börsen-Courier (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "berliner-illustrierte-zeitung--berlin",
+   "label": "Berliner Illustrierte Zeitung",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Berliner Illustrierte Zeitung (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "berliner-lokalanzeiger--berlin",
+   "label": "Berliner Lokalanzeiger",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Berliner Lokalanzeiger (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "blatter-des-deutschen-theaters-berlin--berlin",
+   "label": "Blätter des Deutschen Theaters Berlin",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Blätter des Deutschen Theaters Berlin (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "central-verein-zeitung--berlin",
+   "label": "Central Verein-Zeitung",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Central Verein-Zeitung (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "danziger-neueste-nachrichten--danzig",
+   "label": "Danziger Neueste Nachrichten",
+   "place": "Danzig",
+   "clippings": 1,
+   "catalogue_title_forms": "Danziger Neueste Nachrichten (1)",
+   "catalogue_place_forms": "Danzig (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "forum--munchen",
+   "label": "Das Forum",
+   "place": "München",
+   "clippings": 1,
+   "catalogue_title_forms": "Das Forum (1)",
+   "catalogue_place_forms": "München/Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "tagebuch--berlin",
+   "label": "Das Tagebuch",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Das Tagebuch (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "theater-der-zukunft--augsburg",
+   "label": "Das Theater der Zukunft",
+   "place": "Augsburg",
+   "clippings": 1,
+   "catalogue_title_forms": "Das Theater der Zukunft (1)",
+   "catalogue_place_forms": "Augsburg/Stuttgart (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "demain--genf",
+   "label": "Demain",
+   "place": "Genf",
+   "clippings": 1,
+   "catalogue_title_forms": "Demain (1)",
+   "catalogue_place_forms": "Genf (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "bucherfreund--leipzig",
+   "label": "Der Bücherfreund",
+   "place": "Leipzig",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Bücherfreund (1)",
+   "catalogue_place_forms": "Leipzig (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "kunstwart--munchen",
+   "label": "Der Kunstwart",
+   "place": "München",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Kunstwart (1)",
+   "catalogue_place_forms": "München (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "morgen--berlin",
+   "label": "Der Morgen",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Morgen (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "morgen--wien",
+   "label": "Der Morgen",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Morgen (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "ruf--wien",
+   "label": "Der Ruf",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Ruf (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "tag--berlin",
+   "label": "Der Tag",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Tag (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "wiener-tag--wien",
+   "label": "Der Wiener Tag",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Der Wiener Tag (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "deutsches-philologenblatt--leipzig",
+   "label": "Deutsches Philologenblatt",
+   "place": "Leipzig",
+   "clippings": 1,
+   "catalogue_title_forms": "Deutsches Philologenblatt (1)",
+   "catalogue_place_forms": "Leipzig (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "buhne--wien",
+   "label": "Die Bühne",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Die Bühne (1)",
+   "catalogue_place_forms": "Wien und Leipzig (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "dame--berlin",
+   "label": "Die Dame",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Die Dame (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "freistatt--wien",
+   "label": "Die Freistatt",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Die Freistatt (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "menschheit--bern",
+   "label": "Die Menschheit",
+   "place": "Bern",
+   "clippings": 1,
+   "catalogue_title_forms": "Die Menschheit (1)",
+   "catalogue_place_forms": "Bern/Lausanne (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "musik--berlin",
+   "label": "Die Musik",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Die Musik (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "weite-welt-vom-fels-zum-meer--berlin",
+   "label": "Die weite Welt/Vom Fels zum Meer",
+   "place": "Berlin",
+   "clippings": 1,
+   "catalogue_title_forms": "Die weite Welt/Vom Fels zum Meer (1)",
+   "catalogue_place_forms": "Berlin (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "osterreichische-post--paris",
+   "label": "Die Österreichische Post",
+   "place": "Paris",
+   "clippings": 1,
+   "catalogue_title_forms": "Die Österreichische Post (1)",
+   "catalogue_place_forms": "Paris (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "donauland--wien",
+   "label": "Donauland",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Donauland (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "erkenntnis-und-befreiung--wien",
+   "label": "Erkenntnis und Befreiung",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Erkenntnis und Befreiung (1)",
+   "catalogue_place_forms": "Wien u. a. (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "hamburger-fremdenblatt--hamburg",
+   "label": "Hamburger Fremdenblatt",
+   "place": "Hamburg",
+   "clippings": 1,
+   "catalogue_title_forms": "Hamburger Fremdenblatt (1)",
+   "catalogue_place_forms": "Hamburg (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "hannoverscher-kurier--hannover",
+   "label": "Hannoverscher Kurier",
+   "place": "Hannover",
+   "clippings": 1,
+   "catalogue_title_forms": "Hannoverscher Kurier (1)",
+   "catalogue_place_forms": "Hannover (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "helsingin-sanomat--no-place",
+   "label": "Helsingin Sanomat",
+   "place": "",
+   "clippings": 1,
+   "catalogue_title_forms": "Helsingin Sanomat (1)",
+   "catalogue_place_forms": "(no place) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "illustrazione-toscana-e-dell-etruria--no-place",
+   "label": "Illustrazione Toscana e dell'Etruria",
+   "place": "",
+   "clippings": 1,
+   "catalogue_title_forms": "Illustrazione Toscana e dell'Etruria (1)",
+   "catalogue_place_forms": "(no place) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "judische-revue--prag",
+   "label": "Jüdische Revue",
+   "place": "Prag",
+   "clippings": 1,
+   "catalogue_title_forms": "Jüdische Revue (1)",
+   "catalogue_place_forms": "Prag (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "kraft-aus-dem-boden-organ-der-freiland-liga-judische-territorial-organisation-osterreichs--wien",
+   "label": "Kraft aus dem Boden! Organ der Freiland-Liga Jüdische Territorial-Organisation Österreichs",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Kraft aus dem Boden! Organ der Freiland-Liga Jüdische Territorial-Organisation Österreichs (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "kriegszeitung-der-4-armee--stuttgart",
+   "label": "Kriegszeitung der 4. Armee",
+   "place": "Stuttgart",
+   "clippings": 1,
+   "catalogue_title_forms": "Kriegszeitung der 4. Armee (1)",
+   "catalogue_place_forms": "Stuttgart (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "kunst-und-volk--wien",
+   "label": "Kunst und Volk",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Kunst und Volk (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "kolnische-zeitung--koln",
+   "label": "Kölnische Zeitung",
+   "place": "Köln",
+   "clippings": 1,
+   "catalogue_title_forms": "Kölnische Zeitung (1)",
+   "catalogue_place_forms": "Köln (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "art-libre--brussel",
+   "label": "L'Art Libre",
+   "place": "Brüssel",
+   "clippings": 1,
+   "catalogue_title_forms": "L'Art Libre (1)",
+   "catalogue_place_forms": "Brüssel (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "humanite--paris",
+   "label": "L'Humanité",
+   "place": "Paris",
+   "clippings": 1,
+   "catalogue_title_forms": "L'Humanité (1)",
+   "catalogue_place_forms": "Paris (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "belgique-artistique-et-litteraire--no-place",
+   "label": "La Belgique artistique et littéraire",
+   "place": "",
+   "clippings": 1,
+   "catalogue_title_forms": "La Belgique artistique et littéraire (1)",
+   "catalogue_place_forms": "(no place) (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "carmel--genf",
+   "label": "Le Carmel",
+   "place": "Genf",
+   "clippings": 1,
+   "catalogue_title_forms": "Le Carmel (1)",
+   "catalogue_place_forms": "Genf (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "s-humbles--paris",
+   "label": "Les Humbles",
+   "place": "Paris",
+   "clippings": 1,
+   "catalogue_title_forms": "Les Humbles (1)",
+   "catalogue_place_forms": "Paris (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "literarische-monatshefte--wien",
+   "label": "Literarische Monatshefte",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Literarische Monatshefte (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "lubecker-volksbote--lubeck",
+   "label": "Lübecker Volksbote",
+   "place": "Lübeck",
+   "clippings": 1,
+   "catalogue_title_forms": "Lübecker Volksbote (1)",
+   "catalogue_place_forms": "Lübeck (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "marz--munchen",
+   "label": "März",
+   "place": "München",
+   "clippings": 1,
+   "catalogue_title_forms": "März (1)",
+   "catalogue_place_forms": "München (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "neue-badische-landes-zeitung--mannheim",
+   "label": "Neue Badische Landes Zeitung",
+   "place": "Mannheim",
+   "clippings": 1,
+   "catalogue_title_forms": "Neue Badische Landes Zeitung (1)",
+   "catalogue_place_forms": "Mannheim (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "oyfn-sheydveg-au-carrefour--paris",
+   "label": "Oyfn Sheydveg (Au carrefour)",
+   "place": "Paris",
+   "clippings": 1,
+   "catalogue_title_forms": "Oyfn Sheydveg (Au carrefour) (1)",
+   "catalogue_place_forms": "Paris (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "philobiblon--wien",
+   "label": "Philobiblon",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Philobiblon (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "prager-presse--prag",
+   "label": "Prager Presse",
+   "place": "Prag",
+   "clippings": 1,
+   "catalogue_title_forms": "Prager Presse (1)",
+   "catalogue_place_forms": "Prag (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "readers-news--london",
+   "label": "Readers News",
+   "place": "London",
+   "clippings": 1,
+   "catalogue_title_forms": "Readers News (1)",
+   "catalogue_place_forms": "London (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "salzburger-volksblatt--salzburg",
+   "label": "Salzburger Volksblatt",
+   "place": "Salzburg",
+   "clippings": 1,
+   "catalogue_title_forms": "Salzburger Volksblatt (1)",
+   "catalogue_place_forms": "Salzburg (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "salzburger-wacht--salzburg",
+   "label": "Salzburger Wacht",
+   "place": "Salzburg",
+   "clippings": 1,
+   "catalogue_title_forms": "Salzburger Wacht (1)",
+   "catalogue_place_forms": "Salzburg (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "sonntags-beilage-der-national-zeitung--basel",
+   "label": "Sonntags-Beilage der National-Zeitung",
+   "place": "Basel",
+   "clippings": 1,
+   "catalogue_title_forms": "Sonntags-Beilage der National-Zeitung (1)",
+   "catalogue_place_forms": "Basel (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "stimmen-der-gegenwart--eberswalde",
+   "label": "Stimmen der Gegenwart",
+   "place": "Eberswalde",
+   "clippings": 1,
+   "catalogue_title_forms": "Stimmen der Gegenwart (1)",
+   "catalogue_place_forms": "Eberswalde (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "sunday-dispatch--london",
+   "label": "Sunday Dispatch",
+   "place": "London",
+   "clippings": 1,
+   "catalogue_title_forms": "Sunday Dispatch (1)",
+   "catalogue_place_forms": "London (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "new-york-times-book-review--new-york",
+   "label": "The New York Times Book Review",
+   "place": "New York",
+   "clippings": 1,
+   "catalogue_title_forms": "The New York Times Book Review (1)",
+   "catalogue_place_forms": "New York (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "osterreichische-kunst--wien",
+   "label": "Österreichische Kunst",
+   "place": "Wien",
+   "clippings": 1,
+   "catalogue_title_forms": "Österreichische Kunst (1)",
+   "catalogue_place_forms": "Wien (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "ceske-slovo--prag",
+   "label": "České slovo",
+   "place": "Prag",
+   "clippings": 1,
+   "catalogue_title_forms": "České slovo (1)",
+   "catalogue_place_forms": "Prag (1)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  }
+ ]
+}

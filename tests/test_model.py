@@ -40,3 +40,16 @@ def test_site_data_is_current():
     built = json.loads((ROOT / "docs" / "data" / "clippings.json").read_text(encoding="utf-8"))
     assert built["status"] == DATA["status"]
     assert [e["count"] for e in built["entities"]] == [e["count"] for e in DATA["entities"]]
+
+
+def test_export_matches_page_counts():
+    from export import rows
+    built = json.loads((ROOT / "docs" / "data" / "clippings.json").read_text(encoding="utf-8"))
+    clippings, register = rows(built)
+    assert len(clippings) == len(built["items"]) == 331
+    assert len(register) == len(built["entities"]) == 93
+    per = [r for r in clippings if r["kind"] == "periodical"]
+    assert len(per) == sum(r["clippings"] for r in register) == built["status"]["periodical"]
+    assert {r["status"] for r in clippings} == {"proposal"}
+    on_disk = json.loads((ROOT / "docs" / "data" / "export" / "clippings-modelled.json").read_text(encoding="utf-8"))
+    assert on_disk["rows"] == clippings and "CC BY-NC 4.0" in on_disk["licence"]

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Where Stefan Zweig's press clippings were published: the free-text references of the Aufsatzablage modelled as periodicals with place and date.">
-<title>Zweig Press Clippings, catalogue strings and periodicals</title>
+<meta name="description" content="A tool that carries the free-text publication lines of Stefan Zweig's press clippings into modelled periodicals with place and date, and lets you explore and download the result.">
+<title>Zweig Press Clippings, modelling periodicals from catalogue lines</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="assets/dhcraft/dhcraft-tokens.css">
 <link rel="stylesheet" href="assets/dhcraft/dhcraft-components.css">
@@ -24,16 +24,16 @@
   <a class="dh-brand" href="./"><img src="assets/dhcraft/dhcraft-mark-watercolor-128.png" alt="" width="28" height="32">Zweig Press Clippings</a>
   <a class="site-status" href="#site-notice">Research prototype</a>
   <nav class="dh-nav" aria-label="Main">
-    <ul><li><button type="button" class="navbtn" popovertarget="about">About</button></li></ul>
+    <ul><li><button type="button" class="navbtn" popovertarget="data">Data</button></li><li><button type="button" class="navbtn" popovertarget="about">About</button></li></ul>
   </nav>
 </header>
 
 <main class="app" id="app">
   <div class="intro">
-    <h1>Where were Stefan Zweig's press clippings published?</h1>
-    <div class="mode" role="radiogroup" aria-label="Show the references as">
-      <button type="button" role="radio" aria-checked="true" data-mode="catalogue"><span class="mode-k">Catalogue</span> one row per catalogue line</button>
-      <button type="button" role="radio" aria-checked="false" data-mode="model"><span class="mode-k">Periodicals</span> lines joined by stated rules</button>
+    <h1>Modelling the periodicals of Stefan Zweig's press clippings</h1>
+    <div class="mode" role="radiogroup" aria-label="Part of the tool">
+      <button type="button" role="radio" aria-checked="true" data-mode="catalogue"><span class="mode-k">Model</span> decide how catalogue lines join</button>
+      <button type="button" role="radio" aria-checked="false" data-mode="model"><span class="mode-k">Explore</span> clippings by periodical and year</button>
     </div>
     <p class="key" id="key"></p>
   </div>
@@ -52,12 +52,23 @@
   <p class="vh" id="live" aria-live="polite"></p>
 </main>
 
+<div class="about" id="data" popover>
+  <button type="button" class="close" popovertarget="data" popovertargetaction="hide" aria-label="Close"><svg class="dh-icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+  <h2>Modelled data</h2>
+  <p>One row per clipping with signature, periodical, place, date, page, the catalogue line, the rules applied and the status; and a register with one row per periodical and every catalogue form joined to it. Every statement is a proposal by rule; nothing has been confirmed by a person yet.</p>
+  <ul class="downloads">
+    <li>Clippings <a href="data/export/clippings-modelled.csv" download>CSV</a> <a href="data/export/clippings-modelled.json" download>JSON</a></li>
+    <li>Register of periodicals <a href="data/export/periodicals-register.csv" download>CSV</a> <a href="data/export/periodicals-register.json" download>JSON</a></li>
+  </ul>
+  <p>Licence: derived from the catalogue of Stefan Zweig Digital, Literaturarchiv Salzburg, <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>.</p>
+</div>
+
 <div class="about" id="about" popover>
   <button type="button" class="close" popovertarget="about" popovertargetaction="hide" aria-label="Close"><svg class="dh-icon" aria-hidden="true"><use href="#i-close"/></svg></button>
-  <h2>About this instrument</h2>
+  <h2>About this tool</h2>
   <p>The Aufsatzablage of the Stefan Zweig estate in the Literaturarchiv Salzburg holds Zweig's own collection of press clippings. Its catalogue records where a piece appeared as one line of free text, for example <q>Neue Freie Presse, Wien, 3. 5. 1911, S. 2</q>. As text, the same newspaper can be written in several ways, and two newspapers can share a name.</p>
-  <p>This instrument reads every such line with a deterministic parser into periodical, place, date and page, then joins the lines into periodicals. Case, a leading article and the spelling Litteratur are ignored automatically; a few further joins are editorial decisions, each shown with its reason. Lines the parser cannot read, book references and clippings without a reference stay visible as their own group. Nothing is guessed and nothing has been checked against the facsimiles yet.</p>
-  <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The instrument was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
+  <p>This tool reads every such line with a deterministic parser into periodical, place, date and page, then joins the lines into periodicals. Case, a leading article and the spelling Litteratur are ignored automatically; a few further joins are editorial decisions, each shown with its reason. Lines the parser cannot read, book references and clippings without a reference stay visible as their own group. Nothing is guessed. Every join is a proposal by rule until a person confirms it; deciding in the tool is the next step of its development. The modelled data can be downloaded under Data.</p>
+  <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The tool was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
 </div>
 
 <footer class="dh-foot site-foot">

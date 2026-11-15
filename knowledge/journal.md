@@ -17,10 +17,19 @@ template: journal
 - Publication waits for the operator's word: creating a public GitHub repository, setting the remote and switching on Pages (folder `docs/` on `main`). Until then the footer has no source-code link; add it when the repository exists.
 - Licence conflict to confirm: the TEI catalogue says CC BY-NC 4.0, the stefanzweig.digital imprint says all content CC BY 4.0. The site follows each statement for its own material (catalogue-derived data BY-NC, facsimiles BY). The facsimiles reproduce printed texts of third parties, whose rights the archive's statement may not cover.
 - No parsed field and no join has been checked against the facsimiles. Status of all of them: proposal (agent, 2026-11-15).
-- Not seen by the operator on screen yet. A columns variant built from the GOSSIP role field is under consideration; if decided, it is built beside this state, never in place of it.
+- Not seen by the operator on screen yet. The columns variant from the GOSSIP role field is off the table for the talk and may return as its own idea.
+- Plan for the mask and the decisions is in plan.md; nothing of it is built.
 - Model mode was not measured by the density check, which reads the entry state only.
 
 ## Entries
+
+### 2026-11-15 Reframed as a modelling tool with two parts and an output
+
+- Trigger: the operator's sharpening, relayed by the Research Coordination: a tool to carry the data into the modelled schema, with an input view and an analysis view.
+- Decided: switch renamed Model and Explore; heading names the activity; export of modelled clippings and a periodical register (CSV, JSON, licence CC BY-NC 4.0) under a Data menu; status shown in every mark, with the confirmed form in the key and "none yet"; phone labels wrap to three lines.
+- Found by a fresh reader with one task per part (both solved): hollow not-read marks and the selection ring could be read as "confirmed"; "parser" left open whether a rule or a model; the facsimile pushed the parsed date out of the panel. Not-read marks are now dashed, selection uses the accent, the label reads "Read by rule as", the image is smaller.
+- Changed: scripts/export.py, tests/test_model.py, docs/, knowledge/plan.md (plan for after the talk).
+- Evidence: 17 tests, including one that the export matches the page counts; density check passes at 1280 and 360; keyboard script passes all steps; four downloads answer 200 on the local server.
 
 ### 2026-11-15 Second reading, keyboard path, 200 per cent zoom
 

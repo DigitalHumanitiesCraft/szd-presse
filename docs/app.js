@@ -11,11 +11,13 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
   "September", "October", "November", "December"];
 const NOT_READ = [
   { status: "book", label: "book references" },
-  { status: "unread", label: "lines the parser could not read" },
+  { status: "unread", label: "lines not parsed" },
   { status: "none", label: "without publication line" },
 ];
 
 const $ = (sel) => document.querySelector(sel);
+// Internal mode names: "catalogue" is the Model part (rows are catalogue lines), "model" is the
+// Explore part (rows are modelled periodicals).
 const state = { mode: "catalogue", selected: null, focusIndex: -1 };
 let data;
 let rowsByMode;
@@ -87,6 +89,7 @@ function measure() {
   const width = fig.clientWidth;
   const rows = rowsByMode[state.mode];
   const axisH = 26;
+  const footH = 8;
   let height;
   if (narrow) {
     height = rows.reduce((a, r) => a + weightOf(r), 0) * 46 + axisH;
@@ -97,7 +100,7 @@ function measure() {
   }
   const labelW = Math.min(narrow ? width * 0.46 : width * 0.36, 400);
   const countW = window.matchMedia("(max-width: 480px)").matches ? 0 : 40;
-  return { width, height, axisH, labelW, countW, narrow, plotX0: labelW + 8, plotX1: width - countW - 6 };
+  return { width, height: height - (narrow ? 0 : footH), axisH, labelW, countW, narrow, plotX0: labelW + 8, plotX1: width - countW - 6 };
 }
 
 function xOf(d, L) {
@@ -247,9 +250,11 @@ function render() {
 // Key beside the switch: says what the colours and the two signs mean in the current mode.
 function renderKey() {
   const sw = (c, t) => `<span class="sw c-text-${c}"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>${t}</span>`;
+  // Status of every mark: filled is a proposal by rule, a ringed mark would be confirmed by a person.
+  const status = `<span class="sw st"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>proposal by rule</span><span class="sw st"><svg aria-hidden="true" width="14" height="14"><circle cx="7" cy="7" r="4" fill="currentColor"/><circle cx="7" cy="7" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>confirmed by a person, none yet</span>`;
   $("#key").innerHTML = state.mode === "model"
-    ? `Place of publication ${sw("Wien", "Wien")} ${sw("Berlin", "Berlin")} ${sw("other", "other places")} ${sw("unknown", "unknown")}<span class="sw">${icon("merge")}written forms joined</span><span class="sw">${icon("split")}one title, two periodicals</span>`
-    : `<span class="sw c-text-catalogue"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>one clipping; no colour, since the place is still part of a line of text</span>`;
+    ? `${sw("Wien", "Wien")} ${sw("Berlin", "Berlin")} ${sw("other", "other places")} ${sw("unknown", "place unknown")}<span class="sw">${icon("merge")}forms joined</span><span class="sw">${icon("split")}title split</span>${status}`
+    : status;
 }
 
 function renderLabels(rows, L, P) {
@@ -274,7 +279,7 @@ function renderLabels(rows, L, P) {
     b.style.fontSize = `${fontPx}px`;
     b.dataset.key = row.key;
     let inner = row.kind === "notread"
-      ? NOT_READ.map((x) => `<span class="rl-lane">${data.status[x.status] ?? 0} ${esc(x.label)}</span>`).join("")
+      ? `<span class="rl-lane">${NOT_READ.map((x) => `${data.status[x.status] ?? 0} ${esc(x.label)}`).join("\n")}</span>`
       : `<span class="rl-name">${esc(row.label)}</span>`;
     if (row.kind === "entity") {
       const e = row.entity;
@@ -285,6 +290,7 @@ function renderLabels(rows, L, P) {
       if (icons.length) inner += `<span class="rl-icons">${icons.join("")}</span>`;
     }
     b.innerHTML = inner;
+    if (row.kind === "notread") b.querySelector(".rl-lane").style.lineHeight = `${g.h / NOT_READ.length}px`;
     b.setAttribute("aria-pressed", String(isRowSelected(row)));
     b.addEventListener("click", (ev) => { viaKeyboard(ev); selectRow(row); });
     box.appendChild(b);
@@ -331,7 +337,7 @@ function setMode(mode) {
     b.tabIndex = b.dataset.mode === mode ? 0 : -1;
   });
   render();
-  $("#live").textContent = mode === "model" ? "Showing one row per periodical." : "Showing one row per catalogue spelling.";
+  $("#live").textContent = mode === "model" ? "Explore: one row per periodical." : "Model: one row per catalogue line.";
 }
 
 function selectRow(row) {
@@ -372,9 +378,9 @@ function closePanel() {
 function openHome(focus) {
   const total = data.items.length;
   select(null, `
-    <p>Each dot is one of ${total} press clippings that Stefan Zweig kept, catalogued by the Literaturarchiv Salzburg with one line of free text for where each appeared. Switch between the catalogue's lines and the periodicals joined from them, or open a row or a dot.</p>
-    <button type="button" class="case" data-case="frankfurter"><strong>Four place forms, one newspaper</strong>The Frankfurter Zeitung, written with Frankfurt, Frankfurt a. M., Frankfurt am Main and without place.</button>
-    <button type="button" class="case" data-case="morgen"><strong>One title, two periodicals</strong>Der Morgen in Berlin and Der Morgen in Wien, which the title alone would join.</button>
+    <p>Each mark is one of ${total} press clippings Stefan Zweig kept. In Model, rules propose how the catalogue's free-text lines join into periodicals; Explore shows the result by year. Open a row or a mark.</p>
+    <button type="button" class="case" data-case="frankfurter">Frankfurter Zeitung: four place forms, one newspaper</button>
+    <button type="button" class="case" data-case="morgen">Der Morgen: one title, two periodicals</button>
   `);
   if (focus) $("#panel").focus();
 }
@@ -451,10 +457,10 @@ function openItem(pid) {
     ${img}
     <div class="compare">
       <div><div class="k">Catalogue line</div>${it.raw ? `<span class="str">${esc(it.raw)}</span>` : "<em>no reference</em>"}</div>
-      <div><div class="k">Read by the parser as</div>${model}</div>
+      <div><div class="k">Read by rule as</div>${model}</div>
     </div>
     ${it.decisions.map((d) => `<p class="decision">${icon(d.kind === "alias" ? "merge" : d.kind)}<span>${esc(d.text)}</span></p>`).join("")}
-    <p><span class="status">machine-parsed, not verified</span></p>
+    <p><span class="status">proposal by rule, not confirmed</span></p>
     <p>${esc(it.signature)}, <a class="dh-icon-link" href="${GAMS}${esc(pid)}">Facsimile in Stefan Zweig Digital ${icon("ext")}</a></p>
   `);
   $("#live").textContent = `Clipping ${it.signature} opened.`;
