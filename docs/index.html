@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="A tool that carries the free-text publication lines of Stefan Zweig's press clippings into modelled periodicals with place and date, and lets you explore and download the result.">
-<title>Zweig Press Clippings, modelling periodicals from catalogue lines</title>
+<title>Zweig Press Clippings: normalising and exploring the periodicals of Stefan Zweig's press clippings</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="assets/dhcraft/dhcraft-tokens.css">
 <link rel="stylesheet" href="assets/dhcraft/dhcraft-components.css">
@@ -17,37 +17,37 @@
   <symbol id="i-infer" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><path d="M12 7v3M12 13v.5"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
   <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/></symbol>
+  <symbol id="i-unread" viewBox="0 0 24 24"><path d="M4 6h16M4 12h9M4 18h12"/><path d="m16 14 5 5M21 14l-5 5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></symbol>
+  <symbol id="i-none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 16 16 8"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 </svg>
-<a class="dh-skip" href="#figure">Skip to the figure</a>
+<a class="dh-skip" href="#stage">Skip to the figure</a>
 <header class="dh-head site-head">
   <a class="dh-brand" href="./"><img src="assets/dhcraft/dhcraft-mark-watercolor-128.png" alt="" width="28" height="32">Zweig Press Clippings</a>
   <a class="site-status" href="#site-notice">Research prototype</a>
+  <div class="mode" role="radiogroup" aria-label="View">
+    <button type="button" role="radio" aria-checked="true" data-view="normalise" aria-label="Normalise" aria-describedby="tip-normalise">Normalise<span class="tipbox" role="tooltip" id="tip-normalise">The rules' proposals for joining catalogue lines into periodicals, the uncertain first</span></button>
+    <button type="button" role="radio" aria-checked="false" data-view="explore" aria-label="Explore" aria-describedby="tip-explore">Explore<span class="tipbox" role="tooltip" id="tip-explore">The modelled clippings by periodical and year</span></button>
+  </div>
   <nav class="dh-nav" aria-label="Main">
     <ul><li><button type="button" class="navbtn" popovertarget="data">Data</button></li><li><button type="button" class="navbtn" popovertarget="about">About</button></li></ul>
   </nav>
 </header>
 
 <main class="app" id="app">
-  <div class="intro">
-    <h1>Modelling the periodicals of Stefan Zweig's press clippings</h1>
-    <div class="mode" role="radiogroup" aria-label="Part of the tool">
-      <button type="button" role="radio" aria-checked="true" data-mode="catalogue"><span class="mode-k">Model</span> decide how catalogue lines join</button>
-      <button type="button" role="radio" aria-checked="false" data-mode="model"><span class="mode-k">Explore</span> clippings by periodical and year</button>
-    </div>
-    <p class="key" id="key"></p>
-  </div>
-
   <p class="state" id="loading">Loading the references.</p>
   <p class="state error" id="error" hidden>The references could not be loaded. Reload the page; if it was opened as a file, open it through a web server.</p>
-
   <div class="work" id="work" hidden>
-    <figure class="figure" id="figure" tabindex="-1">
-      <svg id="chart" role="group" aria-label="Clippings by periodical and year. Each dot is one clipping."></svg>
-      <div class="tip" id="tip" role="tooltip" hidden></div>
-      <figcaption class="vh" id="chart-desc"></figcaption>
-    </figure>
-    <aside class="panel" id="panel" aria-label="Details" tabindex="-1"></aside>
+    <section class="stage" id="stage" tabindex="-1" aria-label="Figure">
+      <div class="normalise" id="normalise"></div>
+      <figure class="figure" id="figure" hidden>
+        <svg id="chart" role="group" aria-label="Clippings by periodical and year. Arrow keys move between marks, Enter opens one."></svg>
+        <div class="tip" id="tip" role="tooltip" hidden></div>
+      </figure>
+    </section>
+    <aside class="rail" id="rail" aria-label="Legend and filter"></aside>
+    <aside class="panel" id="panel" aria-label="Details" tabindex="-1" hidden></aside>
   </div>
   <p class="vh" id="live" aria-live="polite"></p>
 </main>
@@ -68,6 +68,7 @@
   <h2>About this tool</h2>
   <p>The Aufsatzablage of the Stefan Zweig estate in the Literaturarchiv Salzburg holds Zweig's own collection of press clippings. Its catalogue records where a piece appeared as one line of free text, for example <q>Neue Freie Presse, Wien, 3. 5. 1911, S. 2</q>. As text, the same newspaper can be written in several ways, and two newspapers can share a name.</p>
   <p>This tool reads every such line with a deterministic parser into periodical, place, date and page, then joins the lines into periodicals. Case, a leading article and the spelling Litteratur are ignored automatically; a few further joins are editorial decisions, each shown with its reason. Lines the parser cannot read, book references and clippings without a reference stay visible as their own group. Nothing is guessed. Every join is a proposal by rule until a person confirms it; deciding in the tool is the next step of its development. The modelled data can be downloaded under Data.</p>
+  <p>Normalise lists the rules' proposals, one row per proposed periodical with the catalogue forms it joins and their counts. The first group holds what needs an expert: a title split by place, a place inferred from other lines, an editorial alias, a line the parser could not read. Explore shows the modelled clippings by periodical and year. The rail on the left is legend and filter for both; a selected entry filters both views.</p>
   <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The tool was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
 </div>
 

@@ -1,5 +1,6 @@
-// Zweig Press Clippings: one figure that shows the same clippings once grouped by the catalogue's
-// free-text strings and once by modelled periodicals. Data are prebuilt by scripts/model.py.
+// Zweig Press Clippings: two views on one dataset. Normalise lists the rules' proposals for joining
+// catalogue lines into periodicals, the uncertain first; Explore shows the modelled clippings by
+// periodical and year. The rail is legend and filter for both. Data are prebuilt by scripts/model.py.
 "use strict";
 
 const SVGNS = "http://www.w3.org/2000/svg";
@@ -9,21 +10,28 @@ const TOP_ENTITIES = 12;
 const GAMS = "https://gams.uni-graz.at/";
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
   "September", "October", "November", "December"];
-const NOT_READ = [
-  { status: "book", label: "book references" },
-  { status: "unread", label: "lines not parsed" },
-  { status: "none", label: "without publication line" },
+const PLACES = [
+  { key: "Wien", label: "Wien" },
+  { key: "Berlin", label: "Berlin" },
+  { key: "other", label: "other places" },
+  { key: "unknown", label: "place unknown" },
+];
+// Kinds of case. Each is a property of a clipping, so a clipping can carry several; the rail
+// counts clippings per kind (inclusive), the place entries above count each clipping once.
+const CASES = [
+  { key: "joined", icon: "merge", label: "forms joined", tip: "the periodical was written in more than one way in the catalogue" },
+  { key: "split", icon: "split", label: "title split", tip: "one title written with two places, taken as two periodicals" },
+  { key: "infer", icon: "infer", label: "place inferred", tip: "no place written; taken from the other lines of the same periodical" },
+  { key: "unread", icon: "unread", label: "not parsed", tip: "the parser leaves the line as it is rather than guess" },
+  { key: "book", icon: "book", label: "book reference", tip: "the line names a book, not a periodical" },
+  { key: "none", icon: "none", label: "no publication line", tip: "the record names no publication" },
 ];
 
 const $ = (sel) => document.querySelector(sel);
-// Internal mode names: "catalogue" is the Model part (rows are catalogue lines), "model" is the
-// Explore part (rows are modelled periodicals).
-const state = { mode: "catalogue", selected: null, focusIndex: -1 };
+const state = { view: "normalise", filter: null, selected: null, focusIndex: -1, showUnchanged: false };
 let data;
-let rowsByMode;
-let rowOf;
 let dotEls = new Map();
-let layoutCache;
+let layout;
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -45,127 +53,131 @@ function dateText(d) {
   return String(d.year);
 }
 
-function cityOf(it) {
-  const e = it.entity && data.entityById.get(it.entity);
-  return e ? e.city : "unknown";
+function xKey(it) {
+  return it.date ? it.date.year * 400 + (it.date.month ?? 0) * 32 + (it.date.day ?? 0) : 0;
 }
 
-// Rows of both modes. Shown periodicals are the largest ones plus every periodical that a
-// split decision produced, so the case "one title, two papers" is always on screen.
-function buildRows() {
+// Derived properties per clipping: its city group and the kinds of case it carries.
+function derive() {
+  data.entityById = new Map(data.entities.map((e) => [e.id, e]));
+  for (const it of data.items) {
+    const e = it.entity && data.entityById.get(it.entity);
+    it.city = e ? e.city : null;
+    const kinds = new Set();
+    if (it.status !== "periodical") kinds.add(it.status);
+    if (e && (Object.keys(e.titleForms).length > 1 || Object.keys(e.placeForms).length > 1)) kinds.add("joined");
+    for (const d of it.decisions) if (d.kind === "split" || d.kind === "infer") kinds.add(d.kind);
+    it.kinds = kinds;
+  }
+  for (const e of data.entities) {
+    e.items = data.items.filter((it) => it.entity === e.id);
+    const forms = new Map();
+    for (const it of e.items) forms.set(written(it), (forms.get(written(it)) ?? 0) + 1);
+    e.forms = [...forms.entries()].sort((a, b) => b[1] - a[1]);
+    // Stated criterion for "needs a decision": a split title, an inferred place or an editorial alias.
+    e.needs = e.items.some((it) => it.decisions.some((d) => d.kind === "split" || d.kind === "infer" || d.kind === "alias"));
+  }
+}
+
+function matches(it) {
+  const f = state.filter;
+  if (!f) return true;
+  return f.type === "place" ? it.city === f.key : it.kinds.has(f.key);
+}
+
+// Rail: legend and filter at once, with clipping counts.
+function renderRail() {
+  const placeCount = (k) => data.items.filter((it) => it.city === k).length;
+  const caseCount = (k) => data.items.filter((it) => it.kinds.has(k)).length;
+  const btn = (type, key, inner, tip, n, name) => {
+    const on = state.filter?.type === type && state.filter.key === key;
+    return `<button type="button" class="rail-item${on ? " on" : ""}" aria-pressed="${on}" data-type="${type}" data-key="${key}" aria-label="${esc(name)}, ${n} clippings" aria-describedby="rt-${key}">${inner}<span class="n">${n}</span><span class="tipbox" role="tooltip" id="rt-${key}">${esc(tip)}</span></button>`;
+  };
+  $("#rail").innerHTML = `
+    <div class="rail-group" role="group" aria-label="Place of publication">${PLACES.map((p) =>
+      btn("place", p.key, `<span class="sw c-${p.key}" aria-hidden="true"></span><span class="rl">${esc(p.label)}</span>`, `clippings in periodicals of ${p.label}`, placeCount(p.key), p.label)).join("")}</div>
+    <div class="rail-group cases" role="group" aria-label="Kind of case">${CASES.map((c) =>
+      btn("case", c.key, `${icon(c.icon)}<span class="vh">${esc(c.label)}</span>`, `${c.label}: ${c.tip}`, caseCount(c.key), c.label)).join("")}</div>
+    ${state.filter ? '<button type="button" class="rail-reset" id="reset">Show all</button>' : ""}`;
+  $("#rail").querySelectorAll(".rail-item").forEach((b) => b.addEventListener("click", () => {
+    const same = state.filter?.type === b.dataset.type && state.filter.key === b.dataset.key;
+    state.filter = same ? null : { type: b.dataset.type, key: b.dataset.key };
+    refresh();
+    $(`#rail [data-key="${b.dataset.key}"]`)?.focus();
+  }));
+  $("#reset")?.addEventListener("click", () => { state.filter = null; refresh(); $("#rail .rail-item").focus(); });
+}
+
+// Normalise: one row per proposal, grouped by what needs an expert first.
+function renderNormalise() {
+  const ents = data.entities.filter((e) => e.items.some(matches));
+  // Within "needs a decision": a split title first, then an inferred place, then an editorial alias.
+  const weight = (e) => (e.split ? 0 : e.items.some((it) => it.kinds.has("infer")) ? 1 : 2);
+  const needs = ents.filter((e) => e.needs).sort((a, b) => weight(a) - weight(b) || b.count - a.count);
+  const joined = ents.filter((e) => !e.needs && e.forms.length > 1).sort((a, b) => b.count - a.count);
+  const unchanged = ents.filter((e) => !e.needs && e.forms.length === 1).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "de"));
+  const loose = ["unread", "book", "none"].map((k) => ({ kind: k, items: data.items.filter((it) => it.status === k && matches(it)) })).filter((g) => g.items.length);
+
+  const sel = state.selected;
+  const entRow = (e) => {
+    const on = sel?.type === "entity" && sel.id === e.id;
+    const marks = [e.split && icon("split", "title split"), e.items.some((it) => it.kinds.has("infer")) && icon("infer", "place inferred")].filter(Boolean).join("");
+    return `<li><button type="button" class="prop${on ? " on" : ""}" aria-pressed="${on}" data-entity="${esc(e.id)}">
+      <span class="prop-head"><span class="sw c-${e.city}" aria-hidden="true"></span><span class="prop-name">${esc(e.label)}</span> <span class="prop-place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>${marks ? `<span class="prop-icons">${marks}</span>` : ""}<span class="prop-n">${e.count}</span></span>
+      <span class="chips">${e.forms.map(([f, n]) => `<code class="chip">${esc(f)}  ${n}</code>`).join("")}</span>
+    </button></li>`;
+  };
+  const looseRow = (g) => {
+    const c = CASES.find((x) => x.key === g.kind);
+    const on = sel?.type === "loose" && sel.id === g.kind;
+    return `<li><button type="button" class="prop${on ? " on" : ""}" aria-pressed="${on}" data-loose="${g.kind}">
+      <span class="prop-head">${icon(c.icon)}<span class="prop-name">${esc(c.label)}</span><span class="prop-n">${g.items.length}</span></span>
+      <span class="chips">${g.items.map((it) => `<code class="chip">${esc(it.raw || it.title)}</code>`).join("")}</span>
+    </button></li>`;
+  };
+  const group = (title, rows) => rows.length ? `<section class="pgroup"><h2>${esc(title)}</h2><ul class="props">${rows.join("")}</ul></section>` : "";
+  const needLoose = loose.filter((g) => g.kind === "unread");
+  const setAside = loose.filter((g) => g.kind !== "unread");
+  $("#normalise").innerHTML =
+    group("Needs a decision", [...needs.map(entRow), ...needLoose.map(looseRow)]) +
+    group("Joined by rule", joined.map(entRow)) +
+    group("Set aside by rule", setAside.map(looseRow)) +
+    (unchanged.length ? `<section class="pgroup"><h2><button type="button" class="opener" aria-expanded="${state.showUnchanged}" id="toggle-unchanged">Unchanged, one form each <span class="prop-n">${unchanged.reduce((a, e) => a + e.count, 0)}</span></button></h2>${state.showUnchanged ? `<ul class="props">${unchanged.map(entRow).join("")}</ul>` : ""}</section>` : "") +
+    (ents.length || loose.length ? "" : '<p class="state">No clipping matches this filter. Choose "Show all" in the rail.</p>');
+  $("#normalise").querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", () => openEntity(b.dataset.entity, b)));
+  $("#normalise").querySelectorAll("[data-loose]").forEach((b) => b.addEventListener("click", () => openLoose(b.dataset.loose, b)));
+  $("#toggle-unchanged")?.addEventListener("click", () => { state.showUnchanged = !state.showUnchanged; renderNormalise(); $("#toggle-unchanged").focus(); });
+}
+
+// Explore: rows of the largest periodicals plus every split periodical, the rest in one row,
+// the not-placed clippings in three lanes. Sizes follow the stage so nothing scrolls.
+function exploreRows() {
   const ents = data.entities;
   const shown = ents.slice(0, TOP_ENTITIES);
   for (const e of ents) if (e.split && !shown.includes(e)) shown.push(e);
-  const shownIds = new Set(shown.map((e) => e.id));
-  const periodicals = data.items.filter((it) => it.status === "periodical");
-
-  const model = shown.map((e) => ({ key: `e:${e.id}`, kind: "entity", entity: e, label: e.label, place: e.place, city: e.city }));
-  const rest = ents.filter((e) => !shownIds.has(e.id));
-  model.push({ key: "rest", kind: "rest", label: `${rest.length} further periodicals`, entities: rest });
-  model.push({ key: "notread", kind: "notread", label: "Not read as a periodical" });
-
-  const forms = new Map();
-  for (const it of periodicals) {
-    if (!shownIds.has(it.entity)) continue;
-    const s = written(it);
-    if (!forms.has(s)) forms.set(s, { key: `s:${s}`, kind: "string", label: s, entity: data.entityById.get(it.entity) });
-  }
-  const restForms = new Set(periodicals.filter((it) => !shownIds.has(it.entity)).map(written));
-  const catalogue = [...forms.values()].sort((a, b) => a.label.localeCompare(b.label, "de"));
-  catalogue.push({ key: "rest", kind: "rest", label: `${restForms.size} further catalogue lines`, entities: rest });
-  catalogue.push({ key: "notread", kind: "notread", label: "Not read as a periodical" });
-
-  rowOf = (it, mode) => {
-    if (it.status !== "periodical") return "notread";
-    if (!shownIds.has(it.entity)) return "rest";
-    return mode === "model" ? `e:${it.entity}` : `s:${written(it)}`;
-  };
-  return { model, catalogue };
+  const ids = new Set(shown.map((e) => e.id));
+  const rows = shown.map((e) => ({ key: e.id, kind: "entity", entity: e, w: 1 }));
+  const rest = ents.filter((e) => !ids.has(e.id));
+  rows.push({ key: "rest", kind: "rest", label: `${rest.length} further periodicals`, entities: rest, w: 1.7 });
+  for (const k of ["unread", "book", "none"]) rows.push({ key: k, kind: "loose", status: k, w: 0.8 });
+  const rowOf = (it) => (it.status !== "periodical" ? it.status : ids.has(it.entity) ? it.entity : "rest");
+  return { rows, rowOf };
 }
 
 function measure() {
   const fig = $("#figure");
-  const narrow = window.matchMedia("(max-width: 900px)").matches;
   const width = fig.clientWidth;
-  const rows = rowsByMode[state.mode];
-  const axisH = 26;
-  const footH = 8;
-  let height;
-  if (narrow) {
-    height = rows.reduce((a, r) => a + weightOf(r), 0) * 46 + axisH;
-    fig.style.blockSize = `${height}px`;
-  } else {
-    fig.style.blockSize = "";
-    height = fig.clientHeight;
-  }
-  const labelW = Math.min(narrow ? width * 0.46 : width * 0.36, 400);
-  const countW = window.matchMedia("(max-width: 480px)").matches ? 0 : 40;
-  return { width, height: height - (narrow ? 0 : footH), axisH, labelW, countW, narrow, plotX0: labelW + 8, plotX1: width - countW - 6 };
+  const height = fig.clientHeight;
+  const narrow = width < 600;
+  // Titles keep at least about 250 px, also when the detail panel narrows the figure.
+  const labelW = narrow ? width * 0.46 : Math.min(420, Math.max(250, width * 0.35));
+  const countW = narrow ? 30 : 46;
+  return { width, height, narrow, axisH: 28, labelW, countW, x0: labelW + 10, x1: width - countW - 8 };
 }
 
 function xOf(d, L) {
   const t = d.year + ((d.month ?? 7) - 1) / 12 + ((d.day ?? 15) - 1) / 365;
-  return L.plotX0 + ((t - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * (L.plotX1 - L.plotX0);
-}
-
-// Places every dot of one mode: x from the date, stacked within its row around the row's
-// centre so that dots of the same months do not hide each other.
-function positions(mode, L) {
-  const rows = rowsByMode[mode];
-  const geo = geometry(rows, L);
-  const rowH = geo.unit;
-  const r = Math.max(2.6, Math.min(5.5, rowH / 5.2));
-  const pos = new Map();
-  const bins = new Map();
-  const notread = { book: 0, unread: 0, none: 0 };
-  const slotW = (L.plotX1 - L.plotX0) / 3;
-  for (const it of data.items) {
-    const key = rowOf(it, mode);
-    const g = geo.byKey.get(key);
-    const cy = g.y + g.h / 2;
-    let x;
-    let y;
-    if (key === "notread") {
-      const k = NOT_READ.findIndex((g) => g.status === it.status);
-      const n = notread[it.status]++;
-      // One lane per group; its label stands in the label column at the same height.
-      const step = r * 2.4;
-      const perLine = Math.max(4, Math.floor((L.plotX1 - L.plotX0 - 8) / step));
-      const lane = g.h / NOT_READ.length;
-      x = L.plotX0 + 4 + (n % perLine) * step;
-      y = g.y + (k + 0.5) * lane + Math.floor(n / perLine) * step;
-    } else {
-      x = xOf(it.date, L);
-      const bin = `${key}|${Math.round(x / (r * 2.1))}`;
-      const n = bins.get(bin) ?? 0;
-      bins.set(bin, n + 1);
-      const step = r * 1.9;
-      const off = n === 0 ? 0 : Math.ceil(n / 2) * step * (n % 2 ? -1 : 1);
-      const lim = g.h / 2 - r;
-      y = cy + Math.max(-lim, Math.min(lim, off));
-    }
-    pos.set(it.pid, { x, y });
-  }
-  return { pos, rowH, r, geo };
-}
-
-// Group rows get more height: the remainder holds many periodicals, the not-read group holds
-// undated dots in three lanes, one per kind.
-function weightOf(row) {
-  return row.kind === "notread" ? 3.2 : row.kind === "rest" ? 1.6 : 1;
-}
-
-function geometry(rows, L) {
-  const total = rows.reduce((a, r) => a + weightOf(r), 0);
-  const unit = (L.height - L.axisH) / total;
-  const byKey = new Map();
-  let y = L.axisH;
-  for (const row of rows) {
-    const h = weightOf(row) * unit;
-    byKey.set(row.key, { y, h });
-    y += h;
-  }
-  return { unit, byKey };
+  return L.x0 + ((t - YEAR_MIN) / (YEAR_MAX - YEAR_MIN)) * (L.x1 - L.x0);
 }
 
 function svgEl(name, attrs, parent) {
@@ -175,370 +187,291 @@ function svgEl(name, attrs, parent) {
   return el;
 }
 
-function rowCount(row, mode) {
-  return data.items.filter((it) => rowOf(it, mode) === row.key).length;
-}
-
-function render() {
+function renderExplore() {
+  const fig = $("#figure");
+  const narrow = fig.clientWidth < 600;
+  const { rows, rowOf } = exploreRows();
+  const totalW = rows.reduce((a, r) => a + r.w, 0);
+  if (narrow) fig.style.blockSize = `${totalW * 56 + 28}px`; else fig.style.blockSize = "";
   const L = measure();
+  const unit = (L.height - L.axisH) / totalW;
+  const geo = new Map();
+  let y = L.axisH;
+  for (const r of rows) { geo.set(r.key, { y, h: r.w * unit }); y += r.w * unit; }
+  const rad = Math.max(3, Math.min(8, unit / 4.6));
+  const font = Math.max(13, Math.min(21, unit * 0.5));
+
   const svg = $("#chart");
-  const mode = state.mode;
-  const rows = rowsByMode[mode];
-  const P = positions(mode, L);
-  layoutCache = { L, P };
-  svg.setAttribute("viewBox", `0 0 ${L.width} ${L.height}`);
   svg.setAttribute("width", L.width);
   svg.setAttribute("height", L.height);
-  document.body.classList.toggle("mode-catalogue", mode === "catalogue");
+  svg.replaceChildren();
+  const grid = svgEl("g", { class: "grid" }, svg);
+  const lastY = geo.get("unread").y;
+  for (let yr = 1900; yr <= 1940; yr += 10) {
+    const x = xOf({ year: yr, month: 1, day: 1 }, L);
+    svgEl("line", { x1: x, x2: x, y1: L.axisH - 4, y2: lastY }, grid);
+    if (yr % 20 === 0) svgEl("text", { x, y: 16, "text-anchor": "middle", class: "axis" }, grid).textContent = yr;
+  }
+  svgEl("line", { class: "rowline", x1: 0, x2: L.width, y1: geo.get("rest").y, y2: geo.get("rest").y }, grid);
+  svgEl("line", { class: "rowline", x1: 0, x2: L.width, y1: lastY, y2: lastY }, grid);
 
-  let grid = svg.querySelector(".grid");
-  if (!grid) {
-    grid = svgEl("g", { class: "grid" }, svg);
-    svgEl("g", { class: "rows" }, svg);
-    svgEl("g", { class: "axis" }, svg);
-    svgEl("g", { class: "notes" }, svg);
-    svgEl("g", { class: "dots" }, svg);
-  }
-  const plotH = L.height - L.axisH;
-  grid.replaceChildren();
-  const axis = svg.querySelector(".axis");
-  axis.replaceChildren();
-  for (let y = 1900; y <= 1940; y += 20) {
-    const x = xOf({ year: y, month: 1, day: 1 }, L);
-    svgEl("line", { x1: x, x2: x, y1: L.axisH - 4, y2: P.geo.byKey.get("notread").y }, grid);
-    const t = svgEl("text", { x, y: 15, "text-anchor": "middle" }, axis);
-    t.textContent = y;
-  }
-  const rowsG = svg.querySelector(".rows");
-  rowsG.replaceChildren();
-  for (const row of rows) {
-    if (row.kind === "rest" || row.kind === "notread") {
-      const y = P.geo.byKey.get(row.key).y;
-      svgEl("line", { class: "rowline", x1: 0, x2: L.width, y1: y, y2: y }, rowsG);
-    }
-  }
-  const notes = svg.querySelector(".notes");
-  notes.replaceChildren();
-
-  const dots = svg.querySelector(".dots");
-  // The first placement and every resize set positions without animation; only a mode switch animates.
-  const instant = !dotEls.size || state.instant;
-  svg.classList.toggle("instant", instant);
-  if (!dotEls.size) {
-    for (const it of data.items) {
-      const c = svgEl("circle", { r: P.r, cx: 0, cy: 0, class: `dot c-${it.status === "periodical" ? cityOf(it) : "unknown"}${it.status === "periodical" ? "" : " hollow"}` }, dots);
-      c.dataset.pid = it.pid;
-      dotEls.set(it.pid, c);
-    }
-  }
+  const pos = new Map();
+  const bins = new Map();
+  const loose = { unread: 0, book: 0, none: 0 };
   for (const it of data.items) {
-    const c = dotEls.get(it.pid);
-    const p = P.pos.get(it.pid);
-    c.setAttribute("r", P.r);
-    c.style.transform = `translate(${p.x}px, ${p.y}px)`;
+    const g = geo.get(rowOf(it));
+    let x;
+    let yy;
+    if (it.status !== "periodical") {
+      // Undated: a grid of marks in the lane, wrapping when the lane is narrow.
+      const n = loose[it.status]++;
+      const step = rad * 2.5;
+      const perLine = Math.max(1, Math.floor((L.x1 - L.x0 - 8) / step));
+      const lines = Math.ceil(data.items.filter((x) => x.status === it.status).length / perLine);
+      x = L.x0 + 4 + (n % perLine) * step;
+      yy = g.y + g.h / 2 + (Math.floor(n / perLine) - (lines - 1) / 2) * step;
+    } else {
+      x = xOf(it.date, L);
+      const bin = `${rowOf(it)}|${Math.round(x / (rad * 2.1))}`;
+      const n = bins.get(bin) ?? 0;
+      bins.set(bin, n + 1);
+      const off = n === 0 ? 0 : Math.ceil(n / 2) * rad * 1.9 * (n % 2 ? -1 : 1);
+      const lim = g.h / 2 - rad;
+      yy = g.y + g.h / 2 + Math.max(-lim, Math.min(lim, off));
+    }
+    pos.set(it.pid, { x, y: yy });
   }
-  if (instant) requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove("instant")));
-  state.instant = false;
-  renderLabels(rows, L, P);
-  applySelection();
-  renderKey();
-  $("#chart-desc").textContent = mode === "model"
-    ? "Rows are periodicals with their place; dots are clippings placed by date."
-    : "Rows are the publication strings exactly as written in the catalogue; dots are clippings placed by date.";
-}
-
-// Key beside the switch: says what the colours and the two signs mean in the current mode.
-function renderKey() {
-  const sw = (c, t) => `<span class="sw c-text-${c}"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>${t}</span>`;
-  // Status of every mark: filled is a proposal by rule, a ringed mark would be confirmed by a person.
-  const status = `<span class="sw st"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>proposal by rule</span><span class="sw st"><svg aria-hidden="true" width="14" height="14"><circle cx="7" cy="7" r="4" fill="currentColor"/><circle cx="7" cy="7" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>confirmed by a person, none yet</span>`;
-  $("#key").innerHTML = state.mode === "model"
-    ? `${sw("Wien", "Wien")} ${sw("Berlin", "Berlin")} ${sw("other", "other places")} ${sw("unknown", "place unknown")}<span class="sw">${icon("merge")}forms joined</span><span class="sw">${icon("split")}title split</span>${status}`
-    : status;
-}
-
-function renderLabels(rows, L, P) {
-  let box = $("#figure .labels");
-  if (!box) {
-    box = document.createElement("div");
-    box.className = "labels";
-    $("#figure").appendChild(box);
+  const dots = svgEl("g", {}, svg);
+  dotEls = new Map();
+  for (const it of data.items) {
+    const p = pos.get(it.pid);
+    const c = svgEl("circle", { cx: p.x, cy: p.y, r: rad, class: `dot ${it.status === "periodical" ? `c-${it.city}` : "loose"}` }, dots);
+    c.dataset.pid = it.pid;
+    dotEls.set(it.pid, c);
   }
+  layout = { L, pos, rows, rowOf };
+
+  // Row labels are buttons over the SVG so they wrap, take focus and open the periodical.
+  const box = document.createElement("div");
+  box.className = "labels";
   box.style.inlineSize = `${L.width}px`;
-  const fontPx = Math.max(12, Math.min(17, P.rowH * 0.58));
-  box.replaceChildren();
-  rows.forEach((row) => {
-    const g = P.geo.byKey.get(row.key);
+  fig.querySelector(".labels")?.remove();
+  for (const r of rows) {
+    const g = geo.get(r.key);
     const b = document.createElement("button");
     b.type = "button";
-    b.className = `rowlabel${row.kind === "rest" || row.kind === "notread" ? " group" : ""}`;
-    b.style.top = `${g.y}px`;
-    b.style.blockSize = `${row.kind === "notread" ? g.h : Math.min(g.h, P.rowH * 1.6)}px`;
-    if (row.kind === "notread") b.setAttribute("aria-label", `Not read as a periodical: ${NOT_READ.map((x) => `${data.status[x.status] ?? 0} ${x.label}`).join(", ")}`);
-    b.style.inlineSize = `${L.labelW}px`;
-    b.style.fontSize = `${fontPx}px`;
-    b.dataset.key = row.key;
-    let inner = row.kind === "notread"
-      ? `<span class="rl-lane">${NOT_READ.map((x) => `${data.status[x.status] ?? 0} ${esc(x.label)}`).join("\n")}</span>`
-      : `<span class="rl-name">${esc(row.label)}</span>`;
-    if (row.kind === "entity") {
-      const e = row.entity;
-      inner += `<span class="rl-place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>`;
-      const icons = [];
-      if (e.merged) icons.push(icon("merge", `${Object.keys(e.titleForms).length} title forms, ${Object.keys(e.placeForms).length} place forms joined`));
-      if (e.split) icons.push(icon("split", "same title as another periodical, separated by place"));
-      if (icons.length) inner += `<span class="rl-icons">${icons.join("")}</span>`;
+    b.className = `rowlabel ${r.kind}`;
+    Object.assign(b.style, { top: `${g.y}px`, blockSize: `${g.h}px`, inlineSize: `${L.labelW}px`, fontSize: `${font}px` });
+    let n;
+    if (r.kind === "entity") {
+      const e = r.entity;
+      const marks = [e.merged && icon("merge", "forms joined"), e.split && icon("split", "title split")].filter(Boolean).join("");
+      b.innerHTML = `<span class="rl-name">${esc(e.label)}</span><span class="rl-place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>${marks ? `<span class="rl-icons">${marks}</span>` : ""}`;
+      b.dataset.entity = e.id;
+      b.addEventListener("click", () => openEntity(e.id, b));
+      n = e.count;
+    } else if (r.kind === "rest") {
+      b.innerHTML = `<span class="rl-name">${esc(r.label)}</span>`;
+      b.addEventListener("click", () => openRest(b));
+      n = r.entities.reduce((a, e) => a + e.count, 0);
+    } else {
+      const c = CASES.find((x) => x.key === r.status);
+      b.innerHTML = `${icon(c.icon)}<span class="rl-name">${esc(c.label)}</span>`;
+      b.style.fontSize = `${Math.max(12, font * 0.8)}px`;
+      b.addEventListener("click", () => openLoose(r.status, b));
+      n = data.items.filter((it) => it.status === r.status).length;
     }
-    b.innerHTML = inner;
-    if (row.kind === "notread") b.querySelector(".rl-lane").style.lineHeight = `${g.h / NOT_READ.length}px`;
-    b.setAttribute("aria-pressed", String(isRowSelected(row)));
-    b.addEventListener("click", (ev) => { viaKeyboard(ev); selectRow(row); });
     box.appendChild(b);
+    if (r.kind === "loose") continue;
     const cnt = document.createElement("span");
     cnt.className = "rowcount";
-    cnt.style.top = `${g.y + g.h / 2 - 9}px`;
-    cnt.style.fontSize = `${Math.max(12, fontPx - 2)}px`;
-    cnt.textContent = row.kind === "notread" ? "" : rowCount(row, state.mode);
+    Object.assign(cnt.style, { top: `${g.y + g.h / 2 - font * 0.6}px`, fontSize: `${Math.max(12, font * 0.8)}px` });
+    cnt.textContent = n;
     cnt.setAttribute("aria-hidden", "true");
     box.appendChild(cnt);
-  });
+  }
+  fig.appendChild(box);
+  applyMarks();
 }
 
-function isRowSelected(row) {
-  const s = state.selected;
-  if (!s) return false;
-  if (s.type === "entity") return row.kind === "entity" ? row.entity.id === s.id : (row.kind === "string" && row.entity.id === s.id);
-  return s.type === row.kind;
-}
-
-// Highlight: an opened periodical keeps its dots strong in both modes, so switching the mode
-// shows its scattered strings joining into one row.
-function applySelection() {
+function applyMarks() {
   const s = state.selected;
   for (const it of data.items) {
     const c = dotEls.get(it.pid);
-    let on = true;
-    if (s?.type === "entity") on = it.entity === s.id || (s.alsoIds ?? []).includes(it.entity);
-    else if (s?.type === "item") on = true;
+    if (!c) continue;
+    let on = matches(it);
+    if (s?.type === "entity") on = on && (it.entity === s.id || (s.also ?? []).includes(it.entity));
+    if (s?.type === "loose") on = on && it.status === s.id;
     c.classList.toggle("dim", !on);
     c.classList.toggle("sel", s?.type === "item" && s.id === it.pid);
   }
-  document.querySelectorAll(".rowlabel").forEach((b) => {
-    const row = rowsByMode[state.mode].find((r) => r.key === b.dataset.key);
-    b.setAttribute("aria-pressed", String(isRowSelected(row)));
+  document.querySelectorAll(".rowlabel[data-entity]").forEach((b) => {
+    const on = s?.type === "entity" && (b.dataset.entity === s.id || (s.also ?? []).includes(b.dataset.entity));
+    b.setAttribute("aria-pressed", String(on));
   });
 }
 
-function setMode(mode) {
-  if (state.mode === mode) return;
-  state.mode = mode;
+function refresh() {
+  renderRail();
+  if (state.view === "normalise") renderNormalise(); else renderExplore();
+}
+
+function setView(view) {
+  state.view = view;
   document.querySelectorAll(".mode button").forEach((b) => {
-    b.setAttribute("aria-checked", String(b.dataset.mode === mode));
-    b.tabIndex = b.dataset.mode === mode ? 0 : -1;
+    const on = b.dataset.view === view;
+    b.setAttribute("aria-checked", String(on));
+    b.tabIndex = on ? 0 : -1;
   });
-  render();
-  $("#live").textContent = mode === "model" ? "Explore: one row per periodical." : "Model: one row per catalogue line.";
+  $("#normalise").hidden = view !== "normalise";
+  $("#figure").hidden = view !== "explore";
+  refresh();
+  history.replaceState(null, "", view === "explore" ? "#explore" : location.pathname + location.search);
+  $("#live").textContent = view === "explore" ? "Explore: clippings by periodical and year." : "Normalise: the rules' proposals.";
 }
 
-function selectRow(row) {
-  if (row.kind === "entity" || row.kind === "string") return openEntity(row.entity.id);
-  if (row.kind === "rest") return openRest();
-  return openNotRead();
-}
-
-function select(sel, html) {
-  if (state.kbOpen) state.returnTo = document.activeElement;
+// Detail panel: opens on a selection and closes again, so the figure keeps the full width.
+function openPanel(sel, html, trigger) {
   state.selected = sel;
-  applySelection();
+  state.returnTo = trigger ?? null;
   const panel = $("#panel");
-  panel.innerHTML = (sel ? `<button type="button" class="back" aria-label="Back to the overview">${icon("close")}</button>` : "") + html;
-  panel.querySelector(".back")?.addEventListener("click", () => closePanel());
-  panel.querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", (ev) => { viaKeyboard(ev); openEntity(b.dataset.entity); }));
-  panel.querySelectorAll("[data-pid]").forEach((b) => b.addEventListener("click", (ev) => { viaKeyboard(ev); openItem(b.dataset.pid); }));
-  panel.querySelectorAll("[data-case]").forEach((b) => b.addEventListener("click", (ev) => { viaKeyboard(ev); openCase(b.dataset.case); }));
+  panel.innerHTML = `<button type="button" class="back" aria-label="Close the details">${icon("close")}</button>${html}`;
+  panel.hidden = false;
+  panel.querySelector(".back").addEventListener("click", closePanel);
+  panel.querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", () => openEntity(b.dataset.entity, state.returnTo)));
+  panel.querySelectorAll("[data-pid]").forEach((b) => b.addEventListener("click", () => openItem(b.dataset.pid, state.returnTo)));
   panel.scrollTop = 0;
-  if (state.kbOpen) panel.focus();
-  state.kbOpen = false;
+  refresh();
+  panel.focus();
 }
 
-// Keyboard activation (Enter, Space, or a click event without pointer) moves focus into the panel.
-function viaKeyboard(ev) {
-  state.kbOpen = !ev || ev.detail === 0;
-}
-
-// Back to the overview; focus returns to the row or dot that opened the panel.
 function closePanel() {
   const back = state.returnTo;
+  state.selected = null;
   state.returnTo = null;
-  openHome(false);
-  if (back && back.isConnected && back !== document.body) back.focus();
-  else $("#panel").focus();
+  $("#panel").hidden = true;
+  refresh();
+  const target = back?.dataset?.entity ? document.querySelector(`[data-entity="${CSS.escape(back.dataset.entity)}"]`) : back;
+  (target && target.isConnected ? target : $("#stage")).focus();
 }
 
-function openHome(focus) {
-  const total = data.items.length;
-  select(null, `
-    <p>Each mark is one of ${total} press clippings Stefan Zweig kept. In Model, rules propose how the catalogue's free-text lines join into periodicals; Explore shows the result by year. Open a row or a mark.</p>
-    <button type="button" class="case" data-case="frankfurter">Frankfurter Zeitung: four place forms, one newspaper</button>
-    <button type="button" class="case" data-case="morgen">Der Morgen: one title, two periodicals</button>
-  `);
-  if (focus) $("#panel").focus();
-}
-
-function openCase(name) {
-  if (name === "frankfurter") {
-    const e = data.entities.find((x) => x.label === "Frankfurter Zeitung");
-    if (state.mode !== "catalogue") setMode("catalogue");
-    openEntity(e.id);
-  } else {
-    const ms = data.entities.filter((x) => x.label === "Der Morgen");
-    if (state.mode !== "model") setMode("model");
-    openEntity(ms[0].id, ms.slice(1).map((x) => x.id));
-  }
-}
-
-function openEntity(id, alsoIds = []) {
+function openEntity(id, trigger) {
   const e = data.entityById.get(id);
-  const items = data.items.filter((it) => it.entity === id).sort((a, b) => xKey(a) - xKey(b));
+  const items = [...e.items].sort((a, b) => xKey(a) - xKey(b));
   const decisions = new Map();
   for (const it of items) for (const d of it.decisions) decisions.set(d.text, d);
-  const titleForms = Object.entries(e.titleForms).sort((a, b) => b[1] - a[1]);
-  const placeForms = Object.entries(e.placeForms).sort((a, b) => b[1] - a[1]);
-  const folded = titleForms.length > 1 && titleForms.some(([f]) => ![...decisions.values()].some((d) => d.text.includes(`“${f}”`)) && f !== e.label);
-  const sibling = alsoIds.map((x) => data.entityById.get(x));
-  select({ type: "entity", id, alsoIds }, `
-    <h2>${esc(e.label)} <span class="place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span></h2>
-    <p>Written in the catalogue as</p>
-    <ul>${titleForms.map(([f, n]) => `<li><span class="str">${esc(f)}</span> <span class="n">${n}</span></li>`).join("")}</ul>
-    <p>with the place</p>
-    <ul>${placeForms.map(([f, n]) => `<li><span class="str">${esc(f)}</span> <span class="n">${n}</span></li>`).join("")}</ul>
-    ${folded ? `<p class="decision">${icon("merge")}<span>Joined by rule: ${esc(data.foldRule)}.</span></p>` : ""}
+  const titleKeys = Object.keys(e.titleForms);
+  const folded = titleKeys.length > 1 && titleKeys.some((f) => f !== e.label && ![...decisions.values()].some((d) => d.text.includes(`“${f}”`)));
+  const also = e.split ? data.entities.filter((x) => x.split && x.label === e.label && x.id !== id) : [];
+  openPanel({ type: "entity", id, also: [] }, `
+    <h2>${esc(e.label)}<span class="place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span></h2>
+    <p class="k">Catalogue lines joined</p>
+    <ul class="forms">${e.forms.map(([f, n]) => `<li><code>${esc(f)}</code> <span class="n">${n}</span></li>`).join("")}</ul>
+    ${folded ? `<p class="decision">${icon("merge")}<span>Rule: ${esc(data.foldRule)}.</span></p>` : ""}
     ${[...decisions.values()].map((d) => `<p class="decision">${icon(d.kind === "alias" ? "merge" : d.kind)}<span>${esc(d.text)}</span></p>`).join("")}
-    ${sibling.map((s) => `<p class="decision">${icon("split")}<span>The other periodical of this title: <button type="button" class="linkish" data-entity="${esc(s.id)}">${esc(s.label)}, ${esc(s.place)}</button></span></p>`).join("")}
-    <p>Clippings</p>
+    ${also.map((s) => `<p class="decision">${icon("split")}<span>The other periodical of this title: <button type="button" class="linkish" data-entity="${esc(s.id)}">${esc(s.label)}, ${esc(s.place)}</button></span></p>`).join("")}
+    <p class="k">Clippings</p>
     <div class="years">${items.map((it) => `<button type="button" class="linkish" data-pid="${esc(it.pid)}">${esc(dateText(it.date))}</button>`).join("")}</div>
-  `);
-  $("#live").textContent = `${e.label} opened.`;
+  `, trigger);
 }
 
-function xKey(it) {
-  return it.date ? it.date.year * 400 + (it.date.month ?? 0) * 32 + (it.date.day ?? 0) : 0;
+function openRest(trigger) {
+  const rest = layout.rows.find((r) => r.kind === "rest");
+  openPanel({ type: "rest" }, `<h2>${esc(rest.label)}</h2>
+    <ul class="forms">${rest.entities.map((e) => `<li><button type="button" class="linkish" data-entity="${esc(e.id)}">${esc(e.label)}</button> <span class="c-text-${e.city}">${esc(e.place ?? "place unknown")}</span> <span class="n">${e.count}</span></li>`).join("")}</ul>`, trigger);
 }
 
-function openRest() {
-  const row = rowsByMode.model.find((r) => r.kind === "rest");
-  select({ type: "rest" }, `
-    <h2>${esc(row.label)}</h2>
-    <ul>${row.entities.map((e) => `<li><button type="button" class="linkish" data-entity="${esc(e.id)}">${esc(e.label)}</button> <span class="c-text-${e.city}">${esc(e.place ?? "place unknown")}</span> <span class="n">${e.count}</span></li>`).join("")}</ul>
-  `);
+function openLoose(kind, trigger) {
+  const c = CASES.find((x) => x.key === kind);
+  const its = data.items.filter((it) => it.status === kind);
+  openPanel({ type: "loose", id: kind }, `<h2>${esc(c.label)}</h2><p>${esc(c.tip)}.</p>
+    <ul class="forms">${its.map((it) => `<li><button type="button" class="linkish" data-pid="${esc(it.pid)}">${esc(it.raw || it.title)}</button></li>`).join("")}</ul>`, trigger);
 }
 
-function openNotRead() {
-  const groups = NOT_READ.map((g) => {
-    const its = data.items.filter((it) => it.status === g.status);
-    return `<p><strong>${its.length} ${esc(g.label)}</strong></p><ul>${its.map((it) => `<li><button type="button" class="linkish" data-pid="${esc(it.pid)}">${esc(it.raw || it.title)}</button></li>`).join("")}</ul>`;
-  });
-  select({ type: "notread" }, `<h2>Not read as a periodical</h2><p>Book references, strings the parser leaves unread rather than guessing, and clippings whose record names no publication.</p>${groups.join("")}`);
-}
-
-function openItem(pid) {
+function openItem(pid, trigger) {
   const it = data.items.find((x) => x.pid === pid);
   const e = it.entity && data.entityById.get(it.entity);
   const img = it.image ? `<figure class="facs"><a href="${GAMS}${esc(pid)}"><img src="img/${esc(pid.replace(":", "_"))}.jpg" alt="First page of the clipping ${esc(it.signature)}" loading="lazy"></a><figcaption>Facsimile: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0</figcaption></figure>` : "";
   let model;
-  if (it.status === "periodical") {
+  if (e) {
     const bits = [it.date && dateText(it.date), it.issue, it.pages && `p. ${it.pages}`].filter(Boolean).map(esc).join(", ");
-    model = `<div class="model-line"><button type="button" class="linkish" data-entity="${esc(e.id)}"><strong>${esc(e.label)}</strong></button>, <span class="c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>${bits ? `, ${bits}` : ""}</div>`;
+    model = `<button type="button" class="linkish" data-entity="${esc(e.id)}"><strong>${esc(e.label)}</strong></button>, <span class="c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>${bits ? `, ${bits}` : ""}`;
   } else {
-    model = `<div class="model-line">${{ book: "Book reference, not a periodical", unread: "Not read: the parser leaves this string as it is", none: "No publication reference in the record" }[it.status]}</div>`;
+    model = esc(CASES.find((x) => x.key === it.status).label);
   }
-  select({ type: "item", id: pid }, `
+  openPanel({ type: "item", id: pid }, `
     <h2>${esc(it.title)}</h2>
-    ${img}
     <div class="compare">
-      <div><div class="k">Catalogue line</div>${it.raw ? `<span class="str">${esc(it.raw)}</span>` : "<em>no reference</em>"}</div>
-      <div><div class="k">Read by rule as</div>${model}</div>
+      <div><p class="k">Catalogue line</p>${it.raw ? `<code class="line">${esc(it.raw)}</code>` : "<em>none</em>"}</div>
+      <div><p class="k">Read by rule as</p><p class="model-line">${model}</p></div>
     </div>
     ${it.decisions.map((d) => `<p class="decision">${icon(d.kind === "alias" ? "merge" : d.kind)}<span>${esc(d.text)}</span></p>`).join("")}
-    <p><span class="status">proposal by rule, not confirmed</span></p>
-    <p>${esc(it.signature)}, <a class="dh-icon-link" href="${GAMS}${esc(pid)}">Facsimile in Stefan Zweig Digital ${icon("ext")}</a></p>
-  `);
-  $("#live").textContent = `Clipping ${it.signature} opened.`;
+    <p class="k">${esc(it.signature)}, proposal by rule, not confirmed</p>
+    ${img}
+    <p><a class="dh-icon-link" href="${GAMS}${esc(pid)}">Facsimile in Stefan Zweig Digital ${icon("ext")}</a></p>
+  `, trigger);
 }
 
-// Tooltip and keyboard on the dots
 function showTip(it, p) {
   const tip = $("#tip");
-  tip.innerHTML = `<code>${esc(it.raw || "no reference")}</code>`;
+  tip.innerHTML = `<code>${esc(it.raw || "no publication line")}</code>`;
   tip.hidden = false;
-  const fig = $("#figure").getBoundingClientRect();
-  const left = Math.min(p.x + 12, fig.width - tip.offsetWidth - 4);
-  tip.style.left = `${Math.max(0, left)}px`;
+  const w = $("#figure").clientWidth;
+  tip.style.left = `${Math.max(0, Math.min(p.x + 12, w - tip.offsetWidth - 4))}px`;
   tip.style.top = `${Math.max(0, p.y - tip.offsetHeight - 10)}px`;
 }
 
 function orderedItems() {
-  const rows = rowsByMode[state.mode];
-  const idx = new Map(rows.map((r, i) => [r.key, i]));
-  return [...data.items].sort((a, b) => (idx.get(rowOf(a, state.mode)) - idx.get(rowOf(b, state.mode))) || (xKey(a) - xKey(b)));
-}
-
-function moveFocus(delta) {
-  const list = orderedItems();
-  state.focusIndex = Math.max(0, Math.min(list.length - 1, state.focusIndex + delta));
-  dotEls.forEach((c) => c.classList.remove("kfocus"));
-  const it = list[state.focusIndex];
-  dotEls.get(it.pid).classList.add("kfocus");
-  showTip(it, layoutCache.P.pos.get(it.pid));
-  return it;
+  const idx = new Map(layout.rows.map((r, i) => [r.key, i]));
+  return data.items.filter(matches).sort((a, b) => (idx.get(layout.rowOf(a)) - idx.get(layout.rowOf(b))) || (xKey(a) - xKey(b)));
 }
 
 function wire() {
   document.querySelectorAll(".mode button").forEach((b) => {
-    b.addEventListener("click", () => setMode(b.dataset.mode));
-    b.tabIndex = b.dataset.mode === state.mode ? 0 : -1;
+    b.addEventListener("click", () => setView(b.dataset.view));
+    b.tabIndex = b.dataset.view === state.view ? 0 : -1;
   });
   $(".mode").addEventListener("keydown", (ev) => {
-    if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") {
-      const next = state.mode === "catalogue" ? "model" : "catalogue";
-      setMode(next);
-      document.querySelector(`.mode [data-mode="${next}"]`).focus();
-      ev.preventDefault();
-    }
+    if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
+    const next = state.view === "normalise" ? "explore" : "normalise";
+    setView(next);
+    document.querySelector(`.mode [data-view="${next}"]`).focus();
+    ev.preventDefault();
   });
   const svg = $("#chart");
   svg.setAttribute("tabindex", "0");
-  svg.setAttribute("aria-label", "Clippings by row and year. Arrow keys move between dots, Enter opens one.");
   svg.addEventListener("pointermove", (ev) => {
     const c = ev.target.closest?.(".dot");
     if (!c) { $("#tip").hidden = true; return; }
     const it = data.items.find((x) => x.pid === c.dataset.pid);
-    showTip(it, layoutCache.P.pos.get(it.pid));
+    showTip(it, layout.pos.get(it.pid));
   });
   svg.addEventListener("pointerleave", () => { $("#tip").hidden = true; });
   svg.addEventListener("click", (ev) => {
     const c = ev.target.closest?.(".dot");
-    if (c) openItem(c.dataset.pid);
+    if (c) openItem(c.dataset.pid, svg);
   });
   svg.addEventListener("keydown", (ev) => {
-    const map = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 10, ArrowUp: -10 };
-    if (ev.key in map) {
-      moveFocus(state.focusIndex < 0 ? 1 : map[ev.key]);
+    const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 10, ArrowUp: -10 }[ev.key];
+    const list = orderedItems();
+    if (step) {
+      state.focusIndex = Math.max(0, Math.min(list.length - 1, state.focusIndex < 0 ? 0 : state.focusIndex + step));
+      dotEls.forEach((c) => c.classList.remove("kfocus"));
+      const it = list[state.focusIndex];
+      dotEls.get(it.pid).classList.add("kfocus");
+      showTip(it, layout.pos.get(it.pid));
       ev.preventDefault();
     } else if ((ev.key === "Enter" || ev.key === " ") && state.focusIndex >= 0) {
-      state.kbOpen = true;
-      openItem(orderedItems()[state.focusIndex].pid);
+      openItem(list[state.focusIndex].pid, svg);
       ev.preventDefault();
-    } else if (ev.key === "Escape") {
-      $("#tip").hidden = true;
     }
   });
   svg.addEventListener("blur", () => { $("#tip").hidden = true; dotEls.forEach((c) => c.classList.remove("kfocus")); });
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && state.selected && !document.querySelector(".about:popover-open")) closePanel();
+    if (ev.key === "Escape" && !$("#panel").hidden && !document.querySelector(".about:popover-open")) closePanel();
   });
   let t;
-  window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { state.instant = true; render(); }, 120); });
+  window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (state.view === "explore") renderExplore(); }, 120); });
 }
 
 async function main() {
@@ -551,13 +484,12 @@ async function main() {
     $("#error").hidden = false;
     return;
   }
-  data.entityById = new Map(data.entities.map((e) => [e.id, e]));
-  rowsByMode = buildRows();
+  derive();
   $("#loading").hidden = true;
   $("#work").hidden = false;
   wire();
-  render();
-  openHome(false);
+  // The address carries the view, so a link or a reload opens Explore directly.
+  setView(location.hash === "#explore" ? "explore" : "normalise");
 }
 
 main();
