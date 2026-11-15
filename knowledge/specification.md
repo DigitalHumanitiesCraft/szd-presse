@@ -21,7 +21,7 @@ What the instrument does and under which constraints it was built.
 - Every mark shows its status. Today every statement is a proposal by rule; the key carries the confirmed state (ringed mark) with "none yet".
 - Every number on the page is computed from the data by code; `tests/test_model.py` fails when parser or joins change the counts.
 - Unparsed, book and missing references are counted and shown as their own group.
-- A click on a dot shows the facsimile, the signature, the original catalogue line next to the modelled fields, the decisions taken on it and the status "machine-parsed, not verified". A click on a row shows every written title and place form the join merged, with the rule or reason.
+- A click on a dot shows the facsimile, the signature, the original catalogue line next to the modelled fields, the rules applied to it and the status "proposal by rule, not confirmed". A click on a row shows every written title and place form the join merged, with the rule or reason.
 - Static HTML, CSS and JavaScript with prebuilt JSON, no build step, no runtime CDN, no client key. One screen at 1280 x 720 and at 1024 x 768 without scrolling for the figure; works at 360 px; keyboard reachable.
 - English interface copy.
 
@@ -40,5 +40,5 @@ Historians who plan an edition of periodicals and organisational records across 
 ## Decisions
 
 - Shown rows: the twelve largest periodicals plus every periodical produced by a split, so the case "one title, two papers" is always visible; the rest in one row.
-- In Catalogue mode the dots are grey, since the catalogue does not know the city; colour by city (Wien, Berlin, other places) appears with the model.
+- In Model the marks carry no city colour, since the catalogue line does not yet give a place to group by; colour by city (Wien, Berlin, other places) appears in Explore.
 - Alternative considered and not taken: cities as rows. It reads more geographically but hides that the periodical as an object is what carries the grouping.
