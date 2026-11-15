@@ -183,6 +183,7 @@ code { font-family: var(--dh-font-mono); }
   .site-status { display: none; }
   .rl-place, .rowcount { display: none; }
   .prop-head { font-size: var(--dh-step-0); flex-wrap: wrap; }
+  .prop { padding-block: var(--dh-space-3); }
   .chip { font-size: var(--dh-step--1); }
 }
 @media (prefers-reduced-motion: reduce) {
