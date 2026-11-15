@@ -112,16 +112,6 @@
    "status_by": "rule (parser and joining rules)"
   },
   {
-   "periodical_id": "allgemeine-zeitung--munchen",
-   "label": "Allgemeine Zeitung",
-   "place": "München",
-   "clippings": 4,
-   "catalogue_title_forms": "Allgemeine Zeitung (4)",
-   "catalogue_place_forms": "München (3) | München (Beilage) (1)",
-   "status": "proposal",
-   "status_by": "rule (parser and joining rules)"
-  },
-  {
    "periodical_id": "magazin-fur-literatur--berlin",
    "label": "Das Magazin für Litteratur",
    "place": "Berlin",
@@ -168,6 +158,16 @@
    "clippings": 4,
    "catalogue_title_forms": "Vom Fels zum Meer (4)",
    "catalogue_place_forms": "Berlin (4)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "allgemeine-zeitung--munchen",
+   "label": "Allgemeine Zeitung",
+   "place": "München",
+   "clippings": 3,
+   "catalogue_title_forms": "Allgemeine Zeitung (3)",
+   "catalogue_place_forms": "München (3)",
    "status": "proposal",
    "status_by": "rule (parser and joining rules)"
   },
@@ -328,6 +328,16 @@
    "clippings": 2,
    "catalogue_title_forms": "Österreichische Rundschau (2)",
    "catalogue_place_forms": "Wien (2)",
+   "status": "proposal",
+   "status_by": "rule (parser and joining rules)"
+  },
+  {
+   "periodical_id": "allgemeine-zeitung-beilage--munchen",
+   "label": "Allgemeine Zeitung (Beilage)",
+   "place": "München",
+   "clippings": 1,
+   "catalogue_title_forms": "Allgemeine Zeitung (1)",
+   "catalogue_place_forms": "München (Beilage) (1)",
    "status": "proposal",
    "status_by": "rule (parser and joining rules)"
   },

@@ -5,6 +5,10 @@ Three kinds of step, each recorded on the item it touches so the page can show i
   alias    editorial decision from data/aliases.json, with its reason
   split    one title written with two different places is taken as two periodicals
   infer    a reference without place takes the place of the only periodical of that title
+  supplement  a place written as "München (Beilage)" marks a supplement, kept as a periodical of its own
+
+Per clipping, "cases" lists the kinds of case its own catalogue line went through; the rail
+counts these, and "counts" holds the numbers the page shows.
 """
 
 import json
@@ -47,8 +51,12 @@ def build(records: list[dict], aliases: dict, image_dir: Path) -> dict:
                 title = a["to"]
                 item["decisions"].append({"kind": "alias", "text": f"title “{written}” read as “{title}”: {a['reason']}"})
             place = parsed["place"]
-            if place in aliases["places"]:
-                a = aliases["places"][place]
+            if place and place.endswith("(Beilage)"):
+                place = place.removesuffix("(Beilage)").strip()
+                title = f"{title} (Beilage)"
+                item["decisions"].append({"kind": "supplement", "text": f"“(Beilage)” written into the place: kept as a supplement, a periodical of its own"})
+            a = aliases["places"].get(place)
+            if a and (not a.get("titles") or written in a["titles"]):
                 item["decisions"].append({"kind": "alias", "text": f"place “{place}” read as “{a['to']}”: {a['reason']}"})
                 place = a["to"]
             item.update(written=written, canon=title, key=title_key(title), place=place, placeWritten=parsed["place"],
@@ -87,11 +95,29 @@ def build(records: list[dict], aliases: dict, image_dir: Path) -> dict:
         })
     out_entities.sort(key=lambda e: (-e["count"], e["label"]))
 
+    ent_by_id = {e["id"]: e for e in out_entities}
     for it in items:
+        cases = []
+        if it["status"] != "periodical":
+            cases.append(it["status"])
+        else:
+            kinds = {d["kind"] for d in it["decisions"]}
+            title_alias = any(d["kind"] == "alias" and d["text"].startswith("title") for d in it["decisions"])
+            folded = it["canon"] != it["written"] or (it["written"] != ent_by_id[it["entity"]]["label"] and not title_alias)
+            if folded and not title_alias and "supplement" not in kinds:
+                cases.append("joined")
+            cases += [k for k in ("alias", "split", "infer", "supplement") if k in kinds]
+        it["cases"] = cases
         it.pop("key", None)
         it.pop("canon", None)
     status = Counter(it["status"] for it in items)
-    return {"foldRule": FOLD_RULE, "items": items, "entities": out_entities, "status": dict(status)}
+    placed = [it for it in items if it["status"] == "periodical"]
+    counts = {
+        "places": dict(Counter(ent_by_id[it["entity"]]["city"] for it in placed)),
+        "notPlaced": len(items) - len(placed),
+        "cases": dict(Counter(k for it in items for k in it["cases"])),
+    }
+    return {"foldRule": FOLD_RULE, "items": items, "entities": out_entities, "status": dict(status), "counts": counts}
 
 
 def check(data: dict) -> None:

@@ -1,21 +1,62 @@
 {
-  "_about": "Editorial decisions that the automatic folding rule cannot take. Each entry is one judgement over the catalogue strings, with its reason. Titles map a written form to the periodical it is taken to mean; places map a written place form to one city.",
+  "_about": "Editorial decisions that the automatic folding rule cannot take. Each entry is one judgement over the catalogue strings, with its reason. Titles map a written form to the periodical it is taken to mean; places map a written place form to one city. A place entry may carry 'titles': the alias then applies only to lines with one of these titles. A supplement written into the place, such as 'München (Beilage)', is not an alias: the model keeps it as a periodical of its own.",
   "titles": {
-    "Berliner Tagblatt": {"to": "Berliner Tageblatt", "reason": "missing letter; same Berlin daily, same period"},
-    "Reclam Universum": {"to": "Reclams Universum", "reason": "missing genitive s; same Leipzig magazine"},
-    "Nationalzeitung": {"to": "National-Zeitung", "reason": "written without hyphen; same Basel daily"},
-    "Der Lesezirken": {"to": "Der Lesezirkel", "reason": "typing error; same Zürich (Hottingen) magazine"},
-    "Uhu. Neue Monatshefte": {"to": "Uhu", "reason": "full title with subtitle; same Berlin monthly"}
+    "Berliner Tagblatt": {
+      "to": "Berliner Tageblatt",
+      "reason": "missing letter; same Berlin daily, same period"
+    },
+    "Reclam Universum": {
+      "to": "Reclams Universum",
+      "reason": "missing genitive s; same Leipzig magazine"
+    },
+    "Nationalzeitung": {
+      "to": "National-Zeitung",
+      "reason": "written without hyphen; same Basel daily"
+    },
+    "Der Lesezirken": {
+      "to": "Der Lesezirkel",
+      "reason": "typing error; same Zürich (Hottingen) magazine"
+    },
+    "Uhu. Neue Monatshefte": {
+      "to": "Uhu",
+      "reason": "full title with subtitle; same Berlin monthly"
+    }
   },
   "places": {
-    "Frankfurt": {"to": "Frankfurt am Main", "reason": "the Frankfurter Zeitung appeared in Frankfurt am Main"},
-    "Frankfurt a. M.": {"to": "Frankfurt am Main", "reason": "abbreviated form"},
-    "München (Beilage)": {"to": "München", "reason": "supplement note written into the place"},
-    "Zürich/Hottingen": {"to": "Zürich", "reason": "Hottingen is a quarter of Zürich"},
-    "Wien und Leipzig": {"to": "Wien", "reason": "first of two places of publication"},
-    "Wien u. a.": {"to": "Wien", "reason": "first of several places of publication"},
-    "München/Berlin": {"to": "München", "reason": "first of two places of publication"},
-    "Bern/Lausanne": {"to": "Bern", "reason": "first of two places of publication"},
-    "Augsburg/Stuttgart": {"to": "Augsburg", "reason": "first of two places of publication"}
+    "Frankfurt": {
+      "to": "Frankfurt am Main",
+      "reason": "the Frankfurter Zeitung appeared in Frankfurt am Main",
+      "titles": [
+        "Frankfurter Zeitung"
+      ]
+    },
+    "Frankfurt a. M.": {
+      "to": "Frankfurt am Main",
+      "reason": "abbreviated form"
+    },
+    "Zürich/Hottingen": {
+      "to": "Zürich",
+      "reason": "Hottingen is a quarter of Zürich"
+    },
+    "Wien und Leipzig": {
+      "to": "Wien",
+      "reason": "first of two places of publication"
+    },
+    "Wien u. a.": {
+      "to": "Wien",
+      "reason": "first of several places of publication"
+    },
+    "München/Berlin": {
+      "to": "München",
+      "reason": "first of two places of publication"
+    },
+    "Bern/Lausanne": {
+      "to": "Bern",
+      "reason": "first of two places of publication"
+    },
+    "Augsburg/Stuttgart": {
+      "to": "Augsburg",
+      "reason": "first of two places of publication"
+    }
   }
 }

@@ -28,7 +28,7 @@ def test_population_is_references_plus_clippings_without_one():
 
 def test_entities():
     ents = {(e["label"], e["place"]): e for e in DATA["entities"]}
-    assert len(DATA["entities"]) == 93
+    assert len(DATA["entities"]) == 94
     fz = ents[("Frankfurter Zeitung", "Frankfurt am Main")]
     assert fz["count"] == 11 and len(fz["placeForms"]) == 4
     assert ents[("Der Morgen", "Berlin")]["split"] and ents[("Der Morgen", "Wien")]["split"]
@@ -47,7 +47,7 @@ def test_export_matches_page_counts():
     built = json.loads((ROOT / "docs" / "data" / "clippings.json").read_text(encoding="utf-8"))
     clippings, register = rows(built)
     assert len(clippings) == len(built["items"]) == 331
-    assert len(register) == len(built["entities"]) == 93
+    assert len(register) == len(built["entities"]) == 94
     per = [r for r in clippings if r["kind"] == "periodical"]
     assert len(per) == sum(r["clippings"] for r in register) == built["status"]["periodical"]
     assert {r["status"] for r in clippings} == {"proposal"}
