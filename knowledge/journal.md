@@ -23,6 +23,17 @@ template: journal
 
 ## Entries
 
+### 2026-11-15 Three independent reviews, stage 1 corrections
+
+- Trigger: three read-only reviews started by the Research Coordination (interface and text; CSS, design system and code; data against the facsimiles with an evaluation design), checked and passed on by the coordination as stage 1.
+- Found, data: the place alias "München (Beilage)" joined a supplement into the Allgemeine Zeitung against the rule stated in data.md; the place alias "Frankfurt" applied to every periodical while its reason names only the Frankfurter Zeitung; "forms joined 178" counted every clipping of any periodical with a variant, including a missing place; the side panel counts were untested.
+- Found, interface: remainder lanes on the time axis read as dated; not every decade labelled; arrow down skipped ten marks instead of moving a row; the alias had different signs in list and panel; accent on icons that trigger nothing; place unknown as text below 4.5:1 (measured 3.61:1); focus after closing the panel could land in the hidden view; the timeline was silent for screen readers; rows used aria-pressed for opening a detail; popovers had no fallback; chips repeated the modelled form; fifteen unparsed lines stood in one row.
+- Found, CSS: dead rules, duplicate declarations, three class families per city colour.
+- Observation of the data review, an inference of an agentic review and not checked here: the catalogue lines appear to be transcribed from the handwritten notes and the slips of the clipping agencies on the clippings, so a check against the facsimile tests the transcription and not the note.
+- Changed: supplement rule in scripts/model.py, scoped place aliases in data/aliases.json, cases and counts per clipping, tests/test_rules.py (the supplement test fails on the committed state before the change, naming the Allgemeine Zeitung; the alias scope test failed before the scope was added); app.js rewritten for the review points; style.css cleaned with one city class; tests/ui/keyboard.cjs and tests/ui/viewer.cjs in the repository.
+- Evidence: 22 tests; keyboard script 19 of 19 and viewer script 6 of 6; density as in design.md, with Explore at 1280 over the limit (open with the operator); screenshots compared with the baseline taken before the CSS changes.
+- Not done (stage 2 or later, waiting for the operator): queue contents, evidence per decision, Explore overviews, row structure for throughput, moving shared rules to brand-assets, thumbnails in a second size, rules and groupings as data.
+
 ### 2026-11-15 Deep-zoom viewer from the archive's IIIF service
 
 - Trigger: the operator asked for IIIF and an IIIF-capable OpenSeadragon so that an expert can read the clipping while deciding.

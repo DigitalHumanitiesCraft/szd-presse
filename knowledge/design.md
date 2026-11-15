@@ -12,49 +12,49 @@ template: design
 
 # Design
 
-How the one instrument looks and behaves, and why.
+How the tool looks and behaves, and why. State of 2026-11-15 after the review corrections (stage 1).
 
 ## Design stance
 
-A specialised instrument for one question, made to be read from the back of a room in a minute. The modelling step is the interaction: one switch moves the same dots from catalogue spellings to periodicals.
+A research tool with two views on one dataset: Normalise, where an expert sees the rules' proposals for joining catalogue lines into periodicals, the uncertain first, with the evidence beside them; and Explore, the modelled clippings by periodical and year. The figure takes the space; everything around it stays restrained.
 
 ## Design system
 
-- Shared DHCraft header and footer from `brand-assets/web` at commit `b0641cc`, copied unchanged into `docs/assets/dhcraft/` (tokens, components, mark, fonts, licence). Header and footer markup follow CorrespExplorer's `index.html` (brand, status pill, dark footer with icon links, licence line); the role field of GOSSIP gave the inline SVG symbol sprite and the icon-with-accessible-name pattern.
+- Shared DHCraft header and footer from `brand-assets/web` at commit `b0641cc`, copied unchanged into `docs/assets/dhcraft/`. Header and footer markup follow CorrespExplorer's `index.html`; the GOSSIP role field gave the inline SVG symbol sprite and the icon-with-accessible-name pattern.
 - Light ground fixed with `data-theme="light"`.
-- Colour carries one meaning: city of publication, Wien, Berlin, other places, unknown. Catalogue mode is grey because the catalogue does not know the city. Accent purple marks only what can be clicked or is selected.
-- Catalogue spellings are set in the monospace, since they are strings a reader compares literally.
+- Colour carries one meaning in both views: place of publication (Wien, Berlin, other places, place unknown), set per element by one class (`city-...`) that defines `--city` for marks and swatches and `--city-text` for text. Text colours reach 4.5:1 or more on the page and surface grounds; place unknown has its own darker text token (measured 5.25:1 on the page ground).
+- Accent purple only on what can be clicked or is selected; icons in the detail panel that trigger nothing are in the soft ink.
+- Catalogue lines in the monospace, since they are strings a reader compares literally.
+
+## Frame
+
+One header row: brand, status pill, a small segmented switch Normalise and Explore with tooltips, Data, About; no page heading. Side panel on the left: places, each placed clipping once, with a note on the clippings not placed; kinds of case, overlapping, each with sign, name and count; a reset when a filter is active; one quiet status line ("Every join is a proposal by rule; none is confirmed yet"). The stage takes the remaining width; the detail panel appears only while something is selected and closes with its button or Escape. The deep-zoom viewer covers the stage while the detail panel stays beside it. The footer stays below the tool and is reached by scrolling the page.
 
 ## Interaction patterns
 
-- Switch Catalogue and Periodicals as a radio group; arrow keys switch.
-- Row labels are buttons over the SVG; dots are reached with arrow keys on the focused figure; Escape returns to the overview.
-- Side panel for the current selection, two prepared cases as its empty state.
+- Switch as a radio group with one tab stop; arrow keys switch. The address `#explore` opens Explore.
+- Side panel entries filter both views (`aria-pressed`); in Explore the entries for clippings without a place also open them in the detail panel, since they have no position on the time axis.
+- Rows that open a detail use `aria-expanded` and `aria-controls="panel"` with a short accessible name. Escape closes the viewer first, then the panel; focus returns to the row or control that opened it, found again in the view that is shown.
+- On the focused timeline, left and right move along a row, up and down to the neighbouring row, Enter opens the clipping; the live region announces catalogue line, periodical, place and date.
+- Facsimile previews in Normalise rows are images inside the row's button; a click opens that clipping, the keyboard reaches the same pages through the row's detail panel.
+- Popovers (Data, About) fall back to toggled elements where the popover attribute is not supported.
 
 ## Visualisation logic
 
-- Unit: one dot per clipping. Composition mode: every item sits in exactly one row; rows and the not-read group add up to the total, asserted in `scripts/model.py` before writing.
-- Each count stands once, at the right end of its row; the total once, in the panel's opening sentence.
-- Legend in the key line beside the switch, which changes with the mode.
+- Explore: one mark per placed clipping, rows for the twelve largest periodicals plus every split periodical, the rest in one row; every decade labelled. Clippings without a place are not drawn on the time axis.
+- Normalise groups: "The text cannot decide" (split titles; each line not parsed as its own row with title, signature, catalogue line and facsimile), "Place inferred, alias or supplement", "Joined by rule", "Set aside by rule" (book references, no publication line), "Unchanged" (counted, can be opened). Only the catalogue forms that differ from the modelled periodical appear as chips.
+- One sign per kind of case everywhere: spelling folded (arrow), editorial alias (pen), title split (fork), place inferred (pin), supplement (pages), not parsed, book reference, no publication line.
+- Counts: places are disjoint and sum to the placed clippings; kinds of case overlap. Both come from `data.counts`, written and tested by `scripts/model.py` and `tests/test_rules.py`.
+- Status: every statement is a proposal by rule; this is said once, in the side panel. No mark or key shows a confirmed state, since nobody has reached it.
 
-## Measurements of 2026-11-15
+## Measurements
 
-`tools/check_ui_density.cjs` (copied unchanged from `pruefansicht`), profile `work`, entry view: wide passes at the limits for text styles and text elements; narrow passes.
-
-## Frame of 2026-11-15, after the operator's rejection
-
-One header row (brand, status pill, switch Normalise and Explore with tooltips, Data, About), no page heading. Rail on the left, legend and filter at once: places with names and counts, kinds of case as icons with counts and tooltips. Stage at full width; the detail panel appears only while something is selected. Normalise rows are separated by hairlines, without boxes; the catalogue forms stand in the monospace with their counts. Explore sizes rows, marks and labels from the stage, so all rows and the three remainder lanes fit at 1280 x 720, 1024 x 768 and 1620 x 920. The footer stays below the tool and is reached by scrolling the page; the tool itself does not scroll.
-
-Density check, profile `work`, measured in both views: Normalise wide 67 text elements, narrow 34; Explore wide 70, narrow 18; all within limits.
-
-## Status in the marks
-
-Filled mark: proposal by rule. Ringed mark (filled with an outer ring): confirmed by a person; none exist yet, the key says so. Dashed outline: not placed (book reference, line not parsed, no publication line). Selection: accent ring. The three must never share a form.
+`tools/check_ui_density.cjs`, profile `work`, 2026-11-15 after stage 1: Normalise passes at 1280 (64 text elements) and 360 (18); Explore passes at 360 (19) and exceeds the limit at 1280 with 83 text elements against 70. The excess comes from the visible case names (his request), the two side panel labels with the note on clippings not placed and the status line (review points 3 and 14), the alias and supplement entries (review point 7) and every decade on the axis (review point 6), less the removed remainder lanes. Whether this is accepted is open with the operator.
 
 ## Operator feedback
 
 - 2026-11-15, relayed by the Research Coordination, verbatim: „Dann würden wir diesen Prototypen gleich auf die erste Folie nach der Vorstellung von mir und DHCraft als Screenshot und mit einem GitHub Pages Link zu einem fertigen Tool. Und das muss wie das GOSSIP Tool oder CorrespExplorer sein? Eben nur spezialisiert und innovativ und fertig ausgebaut“. Maps to yardstick rule 31 (family header and footer). Status: addressed in the first build, not yet seen by the operator.
-- 2026-11-15, relayed by the Research Coordination, verbatim: „Man möchte nicht vor und nach dem Modellieren haben, sondern man möchte eigentlich ein Werkzeug haben, um die Daten in das modellierte Schema zu überführen. damit ich da mit den modellierten Daten arbeiten kann“ and „Das heißt, wir haben ein Tool mit zwei Ansichten: einer Dateneingabeansicht und einer Ansicht zur Analyse.“ Maps to yardstick rule 39 (views by the subject people work with). Status: reframed as Model and Explore with export in this build; the mask with decisions is planned in plan.md.
+- 2026-11-15, relayed by the Research Coordination, verbatim: „Man möchte nicht vor und nach dem Modellieren haben, sondern man möchte eigentlich ein Werkzeug haben, um die Daten in das modellierte Schema zu überführen. damit ich da mit den modellierten Daten arbeiten kann“ and „Das heißt, wir haben ein Tool mit zwei Ansichten: einer Dateneingabeansicht und einer Ansicht zur Analyse.“ Maps to yardstick rule 39 (views by the subject people work with). Status: reframed as Model and Explore (since 588c4f2 named Normalise and Explore) with export; the mask with decisions is planned in plan.md.
 - 2026-11-15, relayed by the Research Coordination, verbatim: „Also, wir haben wieder die gleichen User-Interface-Probleme. Analysiere mal selber kritisch, was das alles ist, und erzeuge das verbesserte User Interface.“ Maps to yardstick rules 14, 22, 28, 35, 41 and to the section on surfaces in Operator-Wissen. Status: rebuilt in commit 588c4f2 and after; not yet seen by the operator.
 - 2026-11-15, relayed by the Research Coordination, verbatim: „ja, Namen ins Panel und Faksimile-Vorschau in die Liste“. Rules 7, 29. His sentence suspends no limit. With the case names visible, Explore at 1280 measures 76 text elements against the limit of 70; the limit is exceeded, and whether that is accepted is an open question with him. (An earlier wording here, taken from a brief, said the limit yielded on his word; that was wrong.) Status: built, commit after 923e3e5.
 - 2026-11-15, on the Explore state before the rebuild, relayed by the Research Coordination, verbatim: „Warum nutzt die Datenvisualisierung nicht die ganze Breite?“ Rule 41. Status: fixed in 588c4f2, the figure takes the stage, the panel appears only on a selection.

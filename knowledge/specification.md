@@ -12,34 +12,32 @@ template: specification
 
 # Specification
 
-What the instrument does and under which constraints it was built.
+What the tool does and under which constraints it is built.
 
 ## Requirements
 
-- A research tool that carries catalogue data into a modelled schema, in two views on one dataset: Normalise, a list of the rules' proposals with one row per proposed periodical and the catalogue forms it joins, grouped as needs a decision (split title, inferred place, editorial alias, line not parsed), joined by rule, set aside by rule, unchanged; and Explore, the modelled clippings by periodical and year, fitted to the viewport. A rail on the left is legend and filter for both; a detail panel opens on a selection and closes again. Deciding in the mask (confirm, reject, change, by a named person) is planned in [plan.md](plan.md), not built.
-- The output is the product: `docs/data/export/` holds the modelled clippings and a register of periodicals as CSV and JSON, with licence, written by `scripts/export.py`; the Data menu offers them.
-- Every mark shows its status. Today every statement is a proposal by rule; the key carries the confirmed state (ringed mark) with "none yet".
-- Every number on the page is computed from the data by code; `tests/test_model.py` fails when parser or joins change the counts.
-- Unparsed, book and missing references are counted and shown as their own group.
-- A click on a dot shows the facsimile, the signature, the original catalogue line next to the modelled fields, the rules applied to it and the status "proposal by rule, not confirmed". A click on a row shows every written title and place form the join merged, with the rule or reason.
-- Static HTML, CSS and JavaScript with prebuilt JSON, no build step, no runtime CDN, no client key. One screen at 1280 x 720 and at 1024 x 768 without scrolling for the figure; works at 360 px; keyboard reachable.
+- A research tool that carries catalogue data into a modelled schema, in two views on one dataset: Normalise (the rules' proposals, the uncertain first, with the evidence beside them) and Explore (the modelled clippings by periodical and year). Deciding in Normalise (confirm, reject, change, by a named person) is planned in [plan.md](plan.md), not built.
+- The output is the product: `docs/data/export/` holds the modelled clippings and a register of periodicals as CSV and JSON with licence, written by `scripts/export.py` and offered under Data.
+- Every number on the page is computed by code: entity, status and export counts in `tests/test_model.py`, side panel counts and rule invariants (supplements, alias scope, written forms and dates found in the catalogue line) in `tests/test_rules.py`.
+- Clippings not read as a periodical (not parsed, book reference, no publication line) are counted and shown, never dropped.
+- A clipping's detail shows its catalogue line, the reading by rule, the rules applied, the signature, a facsimile with a deep-zoom viewer fed by the archive's IIIF service, and the link to the object in GAMS. A periodical's detail shows every catalogue form joined, the rule or reason, and the facsimiles of its clippings.
+- Static HTML, CSS and JavaScript with prebuilt JSON, no build step, no runtime CDN, no client key; OpenSeadragon vendored. Explore fits one screen at 1280 x 720, 1024 x 768 and 1620 x 920; the page works at 360 px and at 200 per cent zoom; every action is reachable by keyboard (`tests/ui/keyboard.cjs`).
 - English interface copy.
 
 ## Epics and user stories
 
-Historians who plan an edition of periodicals and organisational records across countries see in a minute what becomes of a catalogue once the periodical is an object with place and time instead of a line of text, and which decisions that step takes.
+The stories for the work after the talk are in [plan.md](plan.md). For the state built: an archivist sees which catalogue lines the rules propose to treat as one periodical and why, with the cases a text cannot decide first; a historian sees in which periodicals of which places the clippings appeared and when, and downloads the modelled data.
 
 ## Range of functions
 
-- View switch Normalise and Explore in the header; the address `#explore` opens Explore directly.
-- Rail filter by place or kind of case, marked when active, with a reset.
-- Data menu with the four downloads and their licence.
-- The two prepared cases stand where they belong: Der Morgen first in "needs a decision" and behind the rail entry "title split"; the Frankfurter Zeitung row shows its four catalogue forms without a click.
-- Row panel, item panel with facsimile, remainder list of all further periodicals, not-read list.
-- Arrow keys move over the dots, Enter opens, Escape returns to the overview.
+- View switch Normalise and Explore; side panel filter by place or kind of case with reset.
+- Normalise: grouped proposal rows with differing catalogue forms and facsimile previews.
+- Explore: timeline per periodical with remainder row; keyboard navigation with announcements.
+- Detail panel for a periodical, a clipping, the remainder and the clippings without a place; deep-zoom viewer.
+- Data menu with four downloads; About.
 
 ## Decisions
 
-- Shown rows: the twelve largest periodicals plus every periodical produced by a split, so the case "one title, two papers" is always visible; the rest in one row.
-- In Model the marks carry no city colour, since the catalogue line does not yet give a place to group by; colour by city (Wien, Berlin, other places) appears in Explore.
-- Alternative considered and not taken: cities as rows. It reads more geographically but hides that the periodical as an object is what carries the grouping.
+- Shown rows in Explore: the twelve largest periodicals plus every periodical produced by a split.
+- A supplement written into the place ("München (Beilage)") is kept as a periodical of its own; place aliases can be limited to the titles their reason names ("Frankfurt" only for the Frankfurter Zeitung).
+- A clipping counts under "spelling folded" only if its own catalogue line was changed by the folding rule; a missing place counts as "place inferred", not as a folded spelling.
