@@ -32,9 +32,16 @@ const CASES = [
 const CASE = Object.fromEntries(CASES.map((c) => [c.key, c]));
 const ENTITY_SIGNS = ["joined", "alias", "split", "infer", "supplement"];
 const LOOSE = ["unread", "book", "none"];
+// Criteria of "Possible same periodical", each with its sign; the candidates come from scripts/candidates.py.
+const CRITERIA = {
+  supplement: { icon: "supp", label: "supplement beside its paper", tip: "a supplement in the same place as the periodical whose title it names" },
+  combined: { icon: "combined", label: "title within a combined title", tip: "a title written as two titles joined by a slash, beside one of them" },
+  prefix: { icon: "prefix", label: "unparsed line begins with a known title", tip: "a line the parser could not read whose text begins with a periodical already in the register" },
+  near: { icon: "near", label: "near-identical titles", tip: "two titles within two letters of each other" },
+};
 
 const $ = (sel) => document.querySelector(sel);
-const state = { view: "normalise", filter: null, selected: null, focusIndex: -1, showUnchanged: false, back: null };
+const state = { view: "normalise", filter: null, selected: null, focusIndex: -1, byCity: false, back: null };
 let data;
 let dotEls = new Map();
 let layout;
@@ -51,6 +58,11 @@ function icon(id, label) {
 // A sign in a row: icon with its name for screen readers and a tooltip on hover.
 function sign(kind) {
   const c = CASE[kind];
+  return `<span class="sign">${icon(c.icon, c.label)}<span class="tipbox" aria-hidden="true">${esc(c.label)}</span></span>`;
+}
+
+function critSign(key) {
+  const c = CRITERIA[key];
   return `<span class="sign">${icon(c.icon, c.label)}<span class="tipbox" aria-hidden="true">${esc(c.label)}</span></span>`;
 }
 
@@ -94,6 +106,7 @@ function derive() {
 function matches(it) {
   const f = state.filter;
   if (!f) return true;
+  if (f.type === "city") return it.status === "periodical" && (data.entityById.get(it.entity).place ?? "") === f.key;
   return f.type === "place" ? it.city === f.key : it.kinds.has(f.key);
 }
 
@@ -107,15 +120,14 @@ function renderRail() {
   };
   $("#rail").innerHTML = `
     <div class="rail-group" role="group" aria-label="Place of publication, each placed clipping once">
-      <p class="rail-label">Place, each clipping once</p>
+      <p class="rail-label">Place, each clipping once; ${c.notPlaced} not placed</p>
       ${PLACES.map((p) => btn("place", p.key, `<span class="sw city-${p.key}" aria-hidden="true"></span><span class="rl">${esc(p.label)}</span>`, `clippings in periodicals of ${p.label}`, c.places[p.key] ?? 0, p.label)).join("")}
-      <p class="rail-note">${c.notPlaced} not placed, below</p>
     </div>
     <div class="rail-group" role="group" aria-label="Kinds of case, a clipping can have several">
       <p class="rail-label">Kinds of case, may overlap</p>
       ${CASES.map((k) => btn("case", k.key, `${icon(k.icon)}<span class="rl">${esc(k.label)}</span>`, k.tip, c.cases[k.key] ?? 0, k.label)).join("")}
     </div>
-    ${state.filter ? '<button type="button" class="rail-reset" id="reset">Show all</button>' : ""}
+    ${state.filter ? `<button type="button" class="rail-reset" id="reset">${state.filter.type === "city" ? `${esc(state.filter.key || "place unknown")}, show all` : "Show all"}</button>` : ""}
     <p class="rail-status">Every join is a proposal by rule; none is confirmed yet.</p>`;
   $("#rail").querySelectorAll(".rail-item").forEach((b) => b.addEventListener("click", () => {
     const same = state.filter?.type === b.dataset.type && state.filter.key === b.dataset.key;
@@ -147,15 +159,20 @@ function expanded(sel) {
   return Boolean(s && sel && s.type === sel.type && s.id === sel.id);
 }
 
-// Normalise: one row per proposal, grouped by what needs an expert first.
+// Normalise: one row per proposal, grouped by what needs an expert first. Nothing is hidden behind
+// an expander; the list scrolls in its own area.
 function renderNormalise() {
   const ents = data.entities.filter((e) => e.items.some(matches));
   const weight = (e) => (e.kinds.includes("infer") ? 0 : e.kinds.includes("supplement") ? 1 : 2);
-  const undecidable = ents.filter((e) => e.kinds.includes("split")).sort((a, b) => a.label.localeCompare(b.label, "de") || b.count - a.count);
+  const splits = ents.filter((e) => e.kinds.includes("split")).sort((a, b) => a.label.localeCompare(b.label, "de") || b.count - a.count);
   const inferred = ents.filter((e) => e.needs && !e.kinds.includes("split")).sort((a, b) => weight(a) - weight(b) || b.count - a.count);
   const joined = ents.filter((e) => !e.needs && e.forms.length > 1).sort((a, b) => b.count - a.count);
   const unchanged = ents.filter((e) => !e.needs && e.forms.length === 1).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "de"));
-  const unread = data.items.filter((it) => it.status === "unread" && matches(it));
+  const cands = data.candidates.map((c, i) => ({ ...c, i })).filter((c) => sideItems(c.a).concat(sideItems(c.b)).some(matches));
+  const inCand = new Set(data.candidates.filter((c) => c.criterion === "prefix").map((c) => c.a));
+  const unread = data.items.filter((it) => it.status === "unread" && matches(it) && !inCand.has(it.pid));
+  const dateUnread = unread.filter((it) => it.unreadCause === "date-unread");
+  const noPeriodical = unread.filter((it) => it.unreadCause !== "date-unread");
   const setAside = ["book", "none"].map((k) => ({ kind: k, items: data.items.filter((it) => it.status === k && matches(it)) })).filter((g) => g.items.length);
 
   // Only the catalogue forms that differ from the modelled periodical are shown; the head count
@@ -179,6 +196,16 @@ function renderNormalise() {
       ${previews([it])}
     </button></li>`;
   };
+  const candRow = (c) => {
+    const on = expanded({ type: "cand", id: String(c.i) });
+    const crit = CRITERIA[c.criterion];
+    const items = sideItems(c.a).concat(sideItems(c.b));
+    return `<li><button type="button" class="prop cand${on ? " on" : ""}" aria-expanded="${on}" aria-controls="panel" aria-label="${esc(`${sideLabel(c.a)} and ${sideLabel(c.b)}: ${crit.label}`)}" data-cand="${c.i}">
+      <span class="prop-head">${critSign(c.criterion)}<span class="prop-name">${esc(`${sideLabel(c.a)}  and  ${sideLabel(c.b)}`)}</span></span>
+      <span class="chips"><span class="crit">${esc(crit.label)}</span></span>
+      ${previews(items)}
+    </button></li>`;
+  };
   const looseRow = (g) => {
     const c = CASE[g.kind];
     const on = expanded({ type: "loose", id: g.kind });
@@ -190,32 +217,56 @@ function renderNormalise() {
   };
   const group = (title, rows) => rows.length ? `<section class="pgroup"><h2>${esc(title)}</h2><ul class="props">${rows.join("")}</ul></section>` : "";
   $("#normalise").innerHTML =
-    group("The text cannot decide", [...undecidable.map(entRow), ...unread.map(itemRow)]) +
+    group("One title, two places", splits.map(entRow)) +
+    group("Possible same periodical, not joined", cands.map(candRow)) +
+    group("Not parsed: title known, date or issue unread", dateUnread.map(itemRow)) +
+    group("Not parsed: no periodical named", noPeriodical.map(itemRow)) +
     group("Place inferred, alias or supplement", inferred.map(entRow)) +
     group("Joined by rule", joined.map(entRow)) +
     group("Set aside by rule", setAside.map(looseRow)) +
-    (unchanged.length ? `<section class="pgroup"><h2><button type="button" class="opener" aria-expanded="${state.showUnchanged}" id="toggle-unchanged">Unchanged, one form each <span class="prop-n">${unchanged.reduce((a, e) => a + e.count, 0)}</span></button></h2>${state.showUnchanged ? `<ul class="props">${unchanged.map(entRow).join("")}</ul>` : ""}</section>` : "") +
-    (ents.length || unread.length || setAside.length ? "" : '<p class="state">No clipping matches this filter. Choose "Show all" in the side panel.</p>');
+    group("Unchanged, one form each", unchanged.map(entRow)) +
+    (ents.length || unread.length || setAside.length || cands.length ? "" : '<p class="state">No clipping matches this filter. Choose "Show all" in the side panel.</p>');
   const preview = (ev, b) => { const img = ev.target.closest("img[data-pid]"); if (img) { openItem(img.dataset.pid, b); return true; } return false; };
   const root = $("#normalise");
   root.querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", (ev) => { if (!preview(ev, b)) openEntity(b.dataset.entity, b); }));
   root.querySelectorAll("[data-item]").forEach((b) => b.addEventListener("click", () => openItem(b.dataset.item, b)));
+  root.querySelectorAll("[data-cand]").forEach((b) => b.addEventListener("click", (ev) => { if (!preview(ev, b)) openCandidate(Number(b.dataset.cand), b); }));
   root.querySelectorAll("[data-loose]").forEach((b) => b.addEventListener("click", (ev) => { if (!preview(ev, b)) openLoose(b.dataset.loose, b); }));
-  $("#toggle-unchanged")?.addEventListener("click", () => { state.showUnchanged = !state.showUnchanged; renderNormalise(); $("#toggle-unchanged").focus(); });
 }
 
-// Explore: rows of the largest periodicals plus every split periodical and the rest in one row.
-// Clippings without a place are not drawn on the time axis; the side panel shows them.
+// A side of a candidate is either a periodical (entity id) or a single clipping (pid).
+function sideItems(x) {
+  const e = data.entityById.get(x);
+  return e ? e.items : data.items.filter((it) => it.pid === x);
+}
+
+function sideLabel(x) {
+  const e = data.entityById.get(x);
+  if (e) return e.place ? `${e.label}, ${e.place}` : e.label;
+  return data.items.find((it) => it.pid === x).raw;
+}
+
+// Explore: rows by count under the active filter, the largest periodicals (or cities) first, the
+// rest in one remainder row. Clippings without a place are not drawn on the time axis.
+const MAX_ROWS = 12;
 function exploreRows() {
-  const ents = data.entities;
-  const shown = ents.slice(0, TOP_ENTITIES);
-  for (const e of ents) if (e.split && !shown.includes(e)) shown.push(e);
-  const ids = new Set(shown.map((e) => e.id));
-  const rows = shown.map((e) => ({ key: e.id, kind: "entity", entity: e, w: 1 }));
-  const rest = ents.filter((e) => !ids.has(e.id));
-  rows.push({ key: "rest", kind: "rest", label: `${rest.length} further periodicals`, entities: rest, w: 1.7 });
-  const rowOf = (it) => (it.status !== "periodical" ? null : ids.has(it.entity) ? it.entity : "rest");
-  return { rows, rowOf };
+  const placed = data.items.filter((it) => it.status === "periodical" && matches(it));
+  const groupOf = state.byCity ? (it) => `city:${data.entityById.get(it.entity).place ?? ""}` : (it) => it.entity;
+  const counts = new Map();
+  for (const it of placed) counts.set(groupOf(it), (counts.get(groupOf(it)) ?? 0) + 1);
+  const keys = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a) || a.localeCompare(b, "de"));
+  const shown = keys.length > MAX_ROWS + 1 ? keys.slice(0, MAX_ROWS) : keys;
+  const ids = new Set(shown);
+  const rows = shown.map((k) => (state.byCity
+    ? { key: k, kind: "city", city: k.slice(5), count: counts.get(k) }
+    : { key: k, kind: "entity", entity: data.entityById.get(k), count: counts.get(k) }));
+  const restKeys = keys.filter((k) => !ids.has(k));
+  if (restKeys.length) {
+    const n = restKeys.reduce((a, k) => a + counts.get(k), 0);
+    rows.push({ key: "rest", kind: "rest", label: `Remainder: ${restKeys.length} further ${state.byCity ? "places" : "periodicals"}`, keys: restKeys, count: n });
+  }
+  const rowOf = (it) => (it.status !== "periodical" || !matches(it) ? null : ids.has(groupOf(it)) ? groupOf(it) : restKeys.length ? "rest" : null);
+  return { rows, rowOf, placed };
 }
 
 function measure() {
@@ -241,19 +292,53 @@ function svgEl(name, attrs, parent) {
   return el;
 }
 
+// Stacks marks of the same row that fall into the same horizontal slot, centred on the row, so no
+// mark lies on another; a row is as tall as its highest stack needs.
+function stackRows(rows, rowOf, placed, L, rad) {
+  const slots = new Map();
+  for (const it of placed) {
+    const key = rowOf(it);
+    if (!key) continue;
+    const slot = `${key}|${Math.round(xOf(it.date, L) / (rad * 2.05))}`;
+    if (!slots.has(slot)) slots.set(slot, []);
+    slots.get(slot).push(it);
+  }
+  const maxStack = new Map(rows.map((r) => [r.key, 1]));
+  for (const [slot, its] of slots) {
+    const key = slot.slice(0, slot.lastIndexOf("|"));
+    maxStack.set(key, Math.max(maxStack.get(key), its.length));
+  }
+  return { slots, maxStack };
+}
+
 function renderExplore() {
   const fig = $("#figure");
   const narrow = fig.clientWidth < 600;
-  const { rows, rowOf } = exploreRows();
-  const totalW = rows.reduce((a, r) => a + r.w, 0);
-  fig.style.blockSize = narrow ? `${totalW * 56 + 28}px` : "";
+  const { rows, rowOf, placed } = exploreRows();
+  if (narrow) fig.style.blockSize = `${rows.length * 60 + 120}px`; else fig.style.blockSize = "";
   const L = measure();
-  const unit = (L.height - L.axisH) / totalW;
+  const stripH = 44;
+  const top = L.axisH + stripH;
+  const avail = L.height - top - 6;
+  // Choose the mark size so that every row fits its highest stack, with a minimum row height for
+  // the label; shrink the marks until the rows fit the stage.
+  let rad = 8;
+  let st;
+  let need;
+  const minRow = narrow ? 44 : 26;
+  for (let i = 0; i < 12; i += 1) {
+    st = stackRows(rows, rowOf, placed, L, rad);
+    need = rows.map((r) => Math.max(minRow, st.maxStack.get(r.key) * rad * 2.05 + rad));
+    const total = need.reduce((a, b) => a + b, 0);
+    if (total <= avail || rad <= 2.5) break;
+    rad = Math.max(2.5, rad * Math.sqrt(avail / total) * 0.98);
+  }
+  const total = need.reduce((a, b) => a + b, 0);
+  const extra = Math.max(0, avail - total) / rows.length;
   const geo = new Map();
-  let y = L.axisH;
-  for (const r of rows) { geo.set(r.key, { y, h: r.w * unit }); y += r.w * unit; }
-  const rad = Math.max(3, Math.min(8, unit / 4.6));
-  const font = Math.max(13, Math.min(21, unit * 0.5));
+  let y = top;
+  rows.forEach((r, i) => { const h = need[i] + extra; geo.set(r.key, { y, h }); y += h; });
+  const font = Math.max(13, Math.min(20, minRow * 0.62 + extra * 0.1));
 
   const svg = $("#chart");
   svg.setAttribute("width", L.width);
@@ -265,38 +350,54 @@ function renderExplore() {
     svgEl("line", { x1: x, x2: x, y1: L.axisH - 4, y2: L.height }, grid);
     if (!narrow || yr % 20 === 0) svgEl("text", { x, y: 16, "text-anchor": "middle", class: "axis" }, grid).textContent = yr;
   }
-  svgEl("line", { class: "rowline", x1: 0, x2: L.width, y1: geo.get("rest").y, y2: geo.get("rest").y }, grid);
+  // Distribution over the years: one exact bar per year for the clippings under the filter.
+  const perYear = new Map();
+  for (const it of placed) perYear.set(it.date.year, (perYear.get(it.date.year) ?? 0) + 1);
+  const maxYear = Math.max(1, ...perYear.values());
+  const strip = svgEl("g", { class: "years-strip", role: "img", "aria-label": `Clippings per year, at most ${maxYear} in one year` }, svg);
+  for (const [yr, n] of perYear) {
+    const x0 = xOf({ year: yr, month: 1, day: 1 }, L);
+    const x1 = xOf({ year: yr + 1, month: 1, day: 1 }, L);
+    const h = (n / maxYear) * (stripH - 10);
+    svgEl("rect", { x: x0 + 0.5, y: L.axisH + stripH - 4 - h, width: Math.max(1, x1 - x0 - 1), height: h, class: "ybar" }, strip);
+  }
+  const rest = geo.get("rest");
+  if (rest) svgEl("rect", { x: 0, y: rest.y, width: L.width, height: rest.h, class: "restband" }, grid);
 
   const pos = new Map();
-  const bins = new Map();
-  for (const it of data.items) {
-    const key = rowOf(it);
-    if (!key) continue;
+  for (const [slot, its] of st.slots) {
+    const key = slot.slice(0, slot.lastIndexOf("|"));
     const g = geo.get(key);
-    const x = xOf(it.date, L);
-    const bin = `${key}|${Math.round(x / (rad * 2.1))}`;
-    const n = bins.get(bin) ?? 0;
-    bins.set(bin, n + 1);
-    const off = n === 0 ? 0 : Math.ceil(n / 2) * rad * 1.9 * (n % 2 ? -1 : 1);
-    const lim = g.h / 2 - rad;
-    pos.set(it.pid, { x, y: g.y + g.h / 2 + Math.max(-lim, Math.min(lim, off)) });
+    its.sort((a, b) => xKey(a) - xKey(b));
+    its.forEach((it, k) => {
+      const off = (k - (its.length - 1) / 2) * rad * 2.05;
+      pos.set(it.pid, { x: xOf(it.date, L), y: g.y + g.h / 2 + off });
+    });
   }
   const dots = svgEl("g", {}, svg);
   dotEls = new Map();
   for (const it of data.items) {
     const p = pos.get(it.pid);
     if (!p) continue;
-    const c = svgEl("circle", { cx: p.x, cy: p.y, r: rad, class: `dot city-${it.city}` }, dots);
+    const c = svgEl("circle", { cx: p.x, cy: p.y, r: Math.max(2, rad - 0.6), class: `dot city-${it.city}` }, dots);
     c.dataset.pid = it.pid;
     dotEls.set(it.pid, c);
   }
   layout = { L, pos, rows, rowOf };
 
-  // Row labels are buttons over the SVG so they wrap, take focus and open the periodical.
+  // Row labels are buttons over the SVG so they wrap, take focus and open the periodical or city.
   const box = document.createElement("div");
   box.className = "labels";
   box.style.inlineSize = `${L.width}px`;
   fig.querySelector(".labels")?.remove();
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "group-toggle";
+  toggle.id = "group-toggle";
+  toggle.setAttribute("aria-pressed", String(state.byCity));
+  toggle.textContent = "Group by city";
+  toggle.addEventListener("click", () => { state.byCity = !state.byCity; state.focusIndex = -1; renderExplore(); $("#group-toggle").focus(); });
+  box.appendChild(toggle);
   for (const r of rows) {
     const g = geo.get(r.key);
     const b = document.createElement("button");
@@ -304,26 +405,35 @@ function renderExplore() {
     b.className = `rowlabel ${r.kind}`;
     b.setAttribute("aria-controls", "panel");
     Object.assign(b.style, { top: `${g.y}px`, blockSize: `${g.h}px`, inlineSize: `${L.labelW}px`, fontSize: `${font}px` });
-    let n;
     if (r.kind === "entity") {
       const e = r.entity;
       b.innerHTML = `<span class="rl-name">${esc(e.label)}</span><span class="rl-place ctext city-${e.city}">${esc(e.place ?? "place unknown")}</span>${e.kinds.length ? `<span class="signs">${e.kinds.map(sign).join("")}</span>` : ""}`;
       b.dataset.entity = e.id;
-      b.setAttribute("aria-label", `${e.label}, ${e.place ?? "place unknown"}, ${e.count} clippings`);
+      b.setAttribute("aria-label", `${e.label}, ${e.place ?? "place unknown"}, ${r.count} clippings`);
       b.addEventListener("click", () => openEntity(e.id, b));
-      n = e.count;
+    } else if (r.kind === "city") {
+      const grp = r.city === "Wien" || r.city === "Berlin" ? r.city : r.city ? "other" : "unknown";
+      b.innerHTML = `<span class="sw city-${grp}" aria-hidden="true"></span><span class="rl-name">${esc(r.city || "place unknown")}</span>`;
+      b.dataset.city = r.city;
+      b.setAttribute("aria-label", `${r.city || "place unknown"}, ${r.count} clippings; show its periodicals`);
+      b.addEventListener("click", () => {
+        state.filter = { type: "city", key: r.city };
+        state.byCity = false;
+        state.focusIndex = -1;
+        refresh();
+        $("#figure .rowlabel")?.focus();
+      });
     } else {
       b.innerHTML = `<span class="rl-name">${esc(r.label)}</span>`;
       b.dataset.rest = "1";
-      n = r.entities.reduce((a, e) => a + e.count, 0);
-      b.setAttribute("aria-label", `${r.label}, ${n} clippings`);
+      b.setAttribute("aria-label", `${r.label}, ${r.count} clippings`);
       b.addEventListener("click", () => openRest(b));
     }
     box.appendChild(b);
     const cnt = document.createElement("span");
     cnt.className = "rowcount";
     Object.assign(cnt.style, { top: `${g.y + g.h / 2 - font * 0.6}px`, fontSize: `${Math.max(12, font * 0.8)}px` });
-    cnt.textContent = n;
+    cnt.textContent = r.count;
     cnt.setAttribute("aria-hidden", "true");
     box.appendChild(cnt);
   }
@@ -372,7 +482,7 @@ function setView(view) {
 function describe(el) {
   if (!el) return null;
   if (el.id === "chart") return { sel: "#chart" };
-  for (const k of ["entity", "item", "loose", "rest", "key"]) {
+  for (const k of ["entity", "item", "cand", "loose", "rest", "city", "key"]) {
     if (el.dataset?.[k]) return { sel: `[data-${k}="${CSS.escape(el.dataset[k])}"]`, rail: el.closest("#rail") !== null };
   }
   if (el.classList?.contains("zoom-btn")) return null;
@@ -437,8 +547,33 @@ function openEntity(id, trigger) {
 
 function openRest(trigger) {
   const rest = layout.rows.find((r) => r.kind === "rest");
-  openPanel({ type: "rest", id: "rest" }, `<h2>${esc(rest.label)}</h2>
-    <ul class="forms">${rest.entities.map((e) => `<li><button type="button" class="linkish" data-goto-entity="${esc(e.id)}">${esc(e.label)}</button> <span class="ctext city-${e.city}">${esc(e.place ?? "place unknown")}</span> <span class="n">${e.count}</span></li>`).join("")}</ul>`, trigger);
+  const list = state.byCity
+    ? rest.keys.map((k) => k.slice(5)).map((c) => `<li><button type="button" class="linkish" data-goto-city="${esc(c)}">${esc(c || "place unknown")}</button></li>`)
+    : rest.keys.map((id) => data.entityById.get(id)).map((e) => `<li><button type="button" class="linkish" data-goto-entity="${esc(e.id)}">${esc(e.label)}</button> <span class="ctext city-${e.city}">${esc(e.place ?? "place unknown")}</span> <span class="n">${e.items.filter(matches).length}</span></li>`);
+  openPanel({ type: "rest", id: "rest" }, `<h2>${esc(rest.label)}</h2><ul class="forms">${list.join("")}</ul>`, trigger);
+  $("#panel").querySelectorAll("[data-goto-city]").forEach((b) => b.addEventListener("click", () => {
+    state.filter = { type: "city", key: b.dataset.gotoCity };
+    state.byCity = false;
+    closePanel();
+  }));
+}
+
+function openCandidate(i, trigger) {
+  const c = data.candidates[i];
+  const crit = CRITERIA[c.criterion];
+  const side = (x) => {
+    const e = data.entityById.get(x);
+    const its = sideItems(x);
+    const thumbs = `<div class="thumbs">${its.map((it) => `<button type="button" class="thumb" data-goto-item="${esc(it.pid)}">${it.image ? `<img src="img/${esc(it.pid.replace(":", "_"))}.jpg" alt="" loading="lazy">` : ""}<span>${esc(e ? dateText(it.date) : it.signature)}</span></button>`).join("")}</div>`;
+    if (e) return `<h3><button type="button" class="linkish" data-goto-entity="${esc(e.id)}">${esc(e.label)}</button> <span class="ctext city-${e.city}">${esc(e.place ?? "place unknown")}</span></h3><ul class="forms">${e.forms.map(([f, n]) => `<li><code>${esc(f)}</code> <span class="n">${n}</span></li>`).join("")}</ul>${thumbs}`;
+    return `<h3>${esc(its[0].title)}</h3><p><code class="line">${esc(its[0].raw)}</code></p><p class="k">not parsed, ${esc(its[0].signature)}</p>${thumbs}`;
+  };
+  openPanel({ type: "cand", id: String(i) }, `
+    <h2>Possible same periodical</h2>
+    <p class="decision">${icon(crit.icon)}<span>${esc(crit.label)}: ${esc(crit.tip)}. Nothing is joined; the question is open for an expert.</span></p>
+    ${side(c.a)}
+    ${side(c.b)}
+  `, trigger);
 }
 
 function openLoose(kind, trigger) {

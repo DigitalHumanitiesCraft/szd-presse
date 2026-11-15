@@ -40,10 +40,8 @@ const log = (step, ok, note = '') => console.log(`${ok ? 'PASS' : 'FAIL'} ${step
   await page.waitForTimeout(150);
   log('reset clears filter', await page.evaluate(() => !document.querySelector('.rail-item.on')));
   // Unchanged group opens and closes.
-  await page.focus('#toggle-unchanged');
-  await page.keyboard.press('Enter');
-  await page.waitForTimeout(150);
-  log('unchanged group opens', await page.evaluate(() => document.querySelector('#toggle-unchanged').getAttribute('aria-expanded') === 'true'));
+  log('unchanged group listed without an expander', await page.evaluate(() => [...document.querySelectorAll('.pgroup h2')].some((h) => h.textContent.startsWith('Unchanged')) && !document.querySelector('[aria-expanded].opener')));
+  log('candidate group names the five unparsed lines with a known title', await page.evaluate(() => document.querySelectorAll('.prop.cand').length === 9));
   // Switch to Explore with the arrow key.
   await page.focus('[data-view="normalise"]');
   await page.keyboard.press('ArrowRight');
@@ -58,6 +56,17 @@ const log = (step, ok, note = '') => console.log(`${ok ? 'PASS' : 'FAIL'} ${step
   await page.keyboard.press('Escape');
   await page.waitForTimeout(150);
   log('Escape closes and returns focus to figure', await page.evaluate(() => document.querySelector('#panel').hidden && document.activeElement.id === 'chart'));
+  await page.focus('#group-toggle');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(200);
+  log('group by city shows city rows', await page.evaluate(() => !!document.querySelector('.rowlabel[data-city="Basel"]')));
+  await page.focus('.rowlabel[data-city="Basel"]');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(200);
+  log('a city row filters to its periodicals', await page.evaluate(() => [...document.querySelectorAll('.rowlabel.entity')].every((b) => b.getAttribute('aria-label').includes('Basel')) && !!document.querySelector('#reset')), await page.evaluate(() => document.querySelector('#reset')?.textContent));
+  await page.focus('#reset');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(200);
   await page.focus('.rowlabel.entity');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(150);
