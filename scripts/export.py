@@ -82,6 +82,13 @@ def main(site_data: Path, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     write(out_dir / "clippings-modelled", CLIPPING_FIELDS, clippings)
     write(out_dir / "periodicals-register", REGISTER_FIELDS, register)
+    # Possible same periodical: questions for an expert, nothing joined; as on the page.
+    ents = {e["id"]: e for e in data["entities"]}
+    items = {it["pid"]: it for it in data["items"]}
+    side = lambda x: (f"{ents[x]['label']}, {ents[x]['place'] or ''}".rstrip(", ") if x in ents else items[x]["raw"])
+    cands = [{"criterion": c["criterion"], "a": c["a"], "a_label": side(c["a"]), "b": c["b"], "b_label": side(c["b"]),
+              "status": "question for an expert, not joined"} for c in data.get("candidates", [])]
+    write(out_dir / "candidates-same-periodical", ["criterion", "a", "a_label", "b", "b_label", "status"], cands)
     (out_dir / "LICENCE.txt").write_text(LICENCE + "\n", encoding="utf-8")
     print(len(clippings), "clippings,", len(register), "periodicals ->", out_dir)
 

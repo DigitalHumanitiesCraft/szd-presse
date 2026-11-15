@@ -115,6 +115,7 @@ def build(records: list[dict], aliases: dict, image_dir: Path) -> dict:
     counts = {
         "places": dict(Counter(ent_by_id[it["entity"]]["city"] for it in placed)),
         "notPlaced": len(items) - len(placed),
+        "cities": dict(Counter(ent_by_id[it["entity"]]["place"] or "" for it in placed)),
         "cases": dict(Counter(k for it in items for k in it["cases"])),
     }
     return {"foldRule": FOLD_RULE, "items": items, "entities": out_entities, "status": dict(status), "counts": counts}
@@ -132,9 +133,14 @@ def check(data: dict) -> None:
 
 
 def main(records_path: Path, aliases_path: Path, image_dir: Path, out: Path) -> None:
+    from candidates import find, unread_cause
     records = json.loads(records_path.read_text(encoding="utf-8"))
     data = build(records, json.loads(aliases_path.read_text(encoding="utf-8")), image_dir)
     check(data)
+    for it in data["items"]:
+        if it["status"] == "unread":
+            it["unreadCause"] = unread_cause(it["raw"])
+    data["candidates"] = find(data)
     out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(len(data["items"]), data["status"], len(data["entities"]), "periodicals")
 

@@ -1,0 +1,10 @@
+criterion,a,a_label,b,b_label,status
+supplement,beilage des berliner börsen-couriers|Berlin,"Beilage des Berliner Börsen-Couriers, Berlin",berliner börsen-courier|Berlin,"Berliner Börsen-Courier, Berlin","question for an expert, not joined"
+supplement,allgemeine zeitung (beilage)|München,"Allgemeine Zeitung (Beilage), München",allgemeine zeitung|München,"Allgemeine Zeitung, München","question for an expert, not joined"
+supplement,sonntags-beilage der national-zeitung|Basel,"Sonntags-Beilage der National-Zeitung, Basel",national-zeitung|Basel,"National-Zeitung, Basel","question for an expert, not joined"
+combined,weite welt/vom fels zum meer|Berlin,"Die weite Welt/Vom Fels zum Meer, Berlin",vom fels zum meer|Berlin,"Vom Fels zum Meer, Berlin","question for an expert, not joined"
+prefix,o:szd.2730,"Neue Freie Presse, Wien, 25./26. 2. 1932",neue freie presse|Wien,"Neue Freie Presse, Wien","question for an expert, not joined"
+prefix,o:szd.2741,"Pester Lloyd, Budapest, 17. 10. – 8. 11. 1936",pester lloyd|Budapest,"Pester Lloyd, Budapest","question for an expert, not joined"
+prefix,o:szd.2721,"Frankfurter Zeitung, Frankfurt a. M., 17. 10 1920",frankfurter zeitung|Frankfurt am Main,"Frankfurter Zeitung, Frankfurt am Main","question for an expert, not joined"
+prefix,o:szd.2649,"Berliner Tageblatt, Berlin, 19 9. 1914",berliner tageblatt|Berlin,"Berliner Tageblatt, Berlin","question for an expert, not joined"
+prefix,o:szd.2467,"Der Merker, Wien, Jg. 4, Nr. 1 (erstes Jänner-Heft), S. 19–22",merker|Wien,"Der Merker, Wien","question for an expert, not joined"

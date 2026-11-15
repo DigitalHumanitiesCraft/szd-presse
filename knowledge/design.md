@@ -49,7 +49,7 @@ One header row: brand, status pill, a small segmented switch Normalise and Explo
 
 ## Measurements
 
-`tools/check_ui_density.cjs`, profile `work`, 2026-11-15 after stage 1: Normalise passes at 1280 (64 text elements) and 360 (18); Explore passes at 360 (19) and exceeds the limit at 1280 with 83 text elements against 70. The excess comes from the visible case names (his request), the two side panel labels with the note on clippings not placed and the status line (review points 3 and 14), the alias and supplement entries (review point 7) and every decade on the axis (review point 6), less the removed remainder lanes. Whether this is accepted is open with the operator.
+`tools/check_ui_density.cjs`, profile `work`, 2026-11-15 after stage 1: Normalise passes at 1280 (64 text elements) and 360 (18); Explore passes at 360 (19) and exceeds the limit at 1280 with 83 text elements against 70. The excess comes from the visible case names (his request), the two side panel labels with the note on clippings not placed and the status line (review points 3 and 14), the alias and supplement entries (review point 7) and every decade on the axis (review point 6), less the removed remainder lanes. Accepted by the operator for this state: asked by the Research Coordination, verbatim, „Nimmst du die Überschreitung an, und soll die Session jetzt aus Stufe 2 die Liste der möglichen Zusammenführungen und die Übersicht nach Stadt und Jahr bauen?“, he answered „ja ja“ (2026-11-15). The acceptance covers these 83 text elements in Explore at 1280, not further growth; anything added later is measured and reported again.
 
 ## Operator feedback
 

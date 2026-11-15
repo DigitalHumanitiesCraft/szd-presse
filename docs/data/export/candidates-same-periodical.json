@@ -1,0 +1,77 @@
+{
+ "licence": "Derived from the catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg, CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/). Machine-parsed proposals, not verified.",
+ "rows": [
+  {
+   "criterion": "supplement",
+   "a": "beilage des berliner börsen-couriers|Berlin",
+   "a_label": "Beilage des Berliner Börsen-Couriers, Berlin",
+   "b": "berliner börsen-courier|Berlin",
+   "b_label": "Berliner Börsen-Courier, Berlin",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "supplement",
+   "a": "allgemeine zeitung (beilage)|München",
+   "a_label": "Allgemeine Zeitung (Beilage), München",
+   "b": "allgemeine zeitung|München",
+   "b_label": "Allgemeine Zeitung, München",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "supplement",
+   "a": "sonntags-beilage der national-zeitung|Basel",
+   "a_label": "Sonntags-Beilage der National-Zeitung, Basel",
+   "b": "national-zeitung|Basel",
+   "b_label": "National-Zeitung, Basel",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "combined",
+   "a": "weite welt/vom fels zum meer|Berlin",
+   "a_label": "Die weite Welt/Vom Fels zum Meer, Berlin",
+   "b": "vom fels zum meer|Berlin",
+   "b_label": "Vom Fels zum Meer, Berlin",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "prefix",
+   "a": "o:szd.2730",
+   "a_label": "Neue Freie Presse, Wien, 25./26. 2. 1932",
+   "b": "neue freie presse|Wien",
+   "b_label": "Neue Freie Presse, Wien",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "prefix",
+   "a": "o:szd.2741",
+   "a_label": "Pester Lloyd, Budapest, 17. 10. – 8. 11. 1936",
+   "b": "pester lloyd|Budapest",
+   "b_label": "Pester Lloyd, Budapest",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "prefix",
+   "a": "o:szd.2721",
+   "a_label": "Frankfurter Zeitung, Frankfurt a. M., 17. 10 1920",
+   "b": "frankfurter zeitung|Frankfurt am Main",
+   "b_label": "Frankfurter Zeitung, Frankfurt am Main",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "prefix",
+   "a": "o:szd.2649",
+   "a_label": "Berliner Tageblatt, Berlin, 19 9. 1914",
+   "b": "berliner tageblatt|Berlin",
+   "b_label": "Berliner Tageblatt, Berlin",
+   "status": "question for an expert, not joined"
+  },
+  {
+   "criterion": "prefix",
+   "a": "o:szd.2467",
+   "a_label": "Der Merker, Wien, Jg. 4, Nr. 1 (erstes Jänner-Heft), S. 19–22",
+   "b": "merker|Wien",
+   "b_label": "Der Merker, Wien",
+   "status": "question for an expert, not joined"
+  }
+ ]
+}
