@@ -17,10 +17,17 @@ template: journal
 - Publication waits for the operator's word: creating a public GitHub repository, setting the remote and switching on Pages (folder `docs/` on `main`). Until then the footer has no source-code link; add it when the repository exists.
 - Licence conflict to confirm: the TEI catalogue says CC BY-NC 4.0, the stefanzweig.digital imprint says all content CC BY 4.0. The site follows each statement for its own material (catalogue-derived data BY-NC, facsimiles BY). The facsimiles reproduce printed texts of third parties, whose rights the archive's statement may not cover.
 - No parsed field and no join has been checked against the facsimiles. Status of all of them: proposal (agent, 2026-11-15).
-- Not seen by the operator on screen yet.
+- Not seen by the operator on screen yet. A columns variant built from the GOSSIP role field is under consideration; if decided, it is built beside this state, never in place of it.
 - Model mode was not measured by the density check, which reads the entry state only.
 
 ## Entries
+
+### 2026-11-15 Second reading, keyboard path, 200 per cent zoom
+
+- Trigger: request of the Research Coordination before the operator's review.
+- Found: focus stayed in the figure after opening a clipping, so the panel was reachable only past every row; both switch buttons were tab stops; the three not-read groups overlapped and sat under the year axis, read as years; a second fresh reader found "spelling", "modelled", "Model" and "unread" unclear and the catalogue grey confusable with "unknown".
+- Changed: keyboard opening moves focus to the panel and Escape returns it; switch has one tab stop; not-read groups as three labelled lanes; wording of switch, key, panel and groups; catalogue dots in ink.
+- Evidence: Playwright keyboard script, all steps pass; 200 per cent zoom (640 x 360 CSS) without horizontal scroll; density check passes at 1280 and 360.
 
 ### 2026-11-15 Instrument built and checked
 

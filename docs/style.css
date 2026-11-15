@@ -61,6 +61,9 @@ h1 { margin: 0; font: 700 var(--dh-step-2)/1.15 var(--dh-font-display); }
 .rl-icons .dh-icon { inline-size: 1.05em; block-size: 1.05em; }
 .mode-catalogue .rl-name { font-family: var(--dh-font-mono); font-size: .82em; }
 .rowlabel.group .rl-name { color: var(--dh-ink-soft); font-style: italic; }
+.rowlabel[data-key="notread"] { flex-direction: column; align-items: stretch; justify-content: space-around; }
+.rl-lane { color: var(--dh-ink-soft); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rowlabel:hover .rl-lane, .rowlabel:focus-visible .rl-lane { text-decoration: underline; }
 .rowcount { position: absolute; inset-inline-end: 0; font-variant-numeric: tabular-nums; color: var(--dh-ink-soft); font-size: var(--dh-step--1); transition: transform .5s; }
 
 .axis text { fill: var(--dh-ink-soft); font: 400 13px var(--dh-font-text); }
@@ -72,7 +75,8 @@ h1 { margin: 0; font: 700 var(--dh-step-2)/1.15 var(--dh-font-display); }
 .dot.c-other { fill: var(--c-other); }
 .dot.c-unknown { fill: var(--c-unknown); }
 /* The catalogue does not know the city; colour appears only once the place is modelled. */
-.mode-catalogue .dot:not(.hollow) { fill: var(--dh-ink-soft); }
+.mode-catalogue .dot:not(.hollow) { fill: var(--dh-ink); }
+.c-text-catalogue { color: var(--dh-ink); }
 .dot.hollow { fill: var(--dh-ground); stroke: var(--c-unknown); stroke-width: 1.6; }
 .dot.dim { opacity: .18; }
 .dot.sel { stroke: var(--dh-ink); stroke-width: 2.5; }

@@ -11,7 +11,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
   "September", "October", "November", "December"];
 const NOT_READ = [
   { status: "book", label: "book references" },
-  { status: "unread", label: "unread lines" },
+  { status: "unread", label: "lines the parser could not read" },
   { status: "none", label: "without publication line" },
 ];
 
@@ -70,7 +70,7 @@ function buildRows() {
   }
   const restForms = new Set(periodicals.filter((it) => !shownIds.has(it.entity)).map(written));
   const catalogue = [...forms.values()].sort((a, b) => a.label.localeCompare(b.label, "de"));
-  catalogue.push({ key: "rest", kind: "rest", label: `${restForms.size} further spellings`, entities: rest });
+  catalogue.push({ key: "rest", kind: "rest", label: `${restForms.size} further catalogue lines`, entities: rest });
   catalogue.push({ key: "notread", kind: "notread", label: "Not read as a periodical" });
 
   rowOf = (it, mode) => {
@@ -125,9 +125,12 @@ function positions(mode, L) {
     if (key === "notread") {
       const k = NOT_READ.findIndex((g) => g.status === it.status);
       const n = notread[it.status]++;
-      const perLine = Math.max(4, Math.floor((slotW - 150) / (r * 2.4)));
-      x = L.plotX0 + k * slotW + 6 + (n % perLine) * r * 2.4;
-      y = g.y + r + 3 + Math.floor(n / perLine) * r * 2.4;
+      // One lane per group; its label stands in the label column at the same height.
+      const step = r * 2.4;
+      const perLine = Math.max(4, Math.floor((L.plotX1 - L.plotX0 - 8) / step));
+      const lane = g.h / NOT_READ.length;
+      x = L.plotX0 + 4 + (n % perLine) * step;
+      y = g.y + (k + 0.5) * lane + Math.floor(n / perLine) * step;
     } else {
       x = xOf(it.date, L);
       const bin = `${key}|${Math.round(x / (r * 2.1))}`;
@@ -144,7 +147,7 @@ function positions(mode, L) {
 }
 
 // Group rows get more height: the remainder holds many periodicals, the not-read group holds
-// undated dots in a small grid with its counts written under them.
+// undated dots in three lanes, one per kind.
 function weightOf(row) {
   return row.kind === "notread" ? 3.2 : row.kind === "rest" ? 1.6 : 1;
 }
@@ -213,13 +216,6 @@ function render() {
   }
   const notes = svg.querySelector(".notes");
   notes.replaceChildren();
-  const nr = P.geo.byKey.get("notread");
-  const slotW = (L.plotX1 - L.plotX0) / 3;
-  NOT_READ.forEach((g, k) => {
-    const n = data.status[g.status] ?? 0;
-    const t = svgEl("text", { class: "groupnote", x: L.plotX0 + k * slotW + 6, y: nr.y + nr.h - 6 }, notes);
-    t.textContent = `${n} ${g.label}`;
-  });
 
   const dots = svg.querySelector(".dots");
   // The first placement and every resize set positions without animation; only a mode switch animates.
@@ -252,8 +248,8 @@ function render() {
 function renderKey() {
   const sw = (c, t) => `<span class="sw c-text-${c}"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>${t}</span>`;
   $("#key").innerHTML = state.mode === "model"
-    ? `Place of publication ${sw("Wien", "Wien")} ${sw("Berlin", "Berlin")} ${sw("other", "other places")} ${sw("unknown", "unknown")}<span class="sw">${icon("merge")}spellings joined</span><span class="sw">${icon("split")}one title, two periodicals</span>`
-    : `<span class="sw c-text-unknown"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>a clipping; the catalogue line gives no place a reader could group by</span>`;
+    ? `Place of publication ${sw("Wien", "Wien")} ${sw("Berlin", "Berlin")} ${sw("other", "other places")} ${sw("unknown", "unknown")}<span class="sw">${icon("merge")}written forms joined</span><span class="sw">${icon("split")}one title, two periodicals</span>`
+    : `<span class="sw c-text-catalogue"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>one clipping; no colour, since the place is still part of a line of text</span>`;
 }
 
 function renderLabels(rows, L, P) {
@@ -272,11 +268,14 @@ function renderLabels(rows, L, P) {
     b.type = "button";
     b.className = `rowlabel${row.kind === "rest" || row.kind === "notread" ? " group" : ""}`;
     b.style.top = `${g.y}px`;
-    b.style.blockSize = `${Math.min(g.h, P.rowH * 1.6)}px`;
+    b.style.blockSize = `${row.kind === "notread" ? g.h : Math.min(g.h, P.rowH * 1.6)}px`;
+    if (row.kind === "notread") b.setAttribute("aria-label", `Not read as a periodical: ${NOT_READ.map((x) => `${data.status[x.status] ?? 0} ${x.label}`).join(", ")}`);
     b.style.inlineSize = `${L.labelW}px`;
     b.style.fontSize = `${fontPx}px`;
     b.dataset.key = row.key;
-    let inner = `<span class="rl-name">${esc(row.label)}</span>`;
+    let inner = row.kind === "notread"
+      ? NOT_READ.map((x) => `<span class="rl-lane">${data.status[x.status] ?? 0} ${esc(x.label)}</span>`).join("")
+      : `<span class="rl-name">${esc(row.label)}</span>`;
     if (row.kind === "entity") {
       const e = row.entity;
       inner += `<span class="rl-place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>`;
@@ -287,7 +286,7 @@ function renderLabels(rows, L, P) {
     }
     b.innerHTML = inner;
     b.setAttribute("aria-pressed", String(isRowSelected(row)));
-    b.addEventListener("click", () => selectRow(row));
+    b.addEventListener("click", (ev) => { viaKeyboard(ev); selectRow(row); });
     box.appendChild(b);
     const cnt = document.createElement("span");
     cnt.className = "rowcount";
@@ -327,7 +326,10 @@ function applySelection() {
 function setMode(mode) {
   if (state.mode === mode) return;
   state.mode = mode;
-  document.querySelectorAll(".mode button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === mode)));
+  document.querySelectorAll(".mode button").forEach((b) => {
+    b.setAttribute("aria-checked", String(b.dataset.mode === mode));
+    b.tabIndex = b.dataset.mode === mode ? 0 : -1;
+  });
   render();
   $("#live").textContent = mode === "model" ? "Showing one row per periodical." : "Showing one row per catalogue spelling.";
 }
@@ -339,23 +341,40 @@ function selectRow(row) {
 }
 
 function select(sel, html) {
+  if (state.kbOpen) state.returnTo = document.activeElement;
   state.selected = sel;
   applySelection();
   const panel = $("#panel");
   panel.innerHTML = (sel ? `<button type="button" class="back" aria-label="Back to the overview">${icon("close")}</button>` : "") + html;
-  panel.querySelector(".back")?.addEventListener("click", () => openHome(true));
-  panel.querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", () => openEntity(b.dataset.entity)));
-  panel.querySelectorAll("[data-pid]").forEach((b) => b.addEventListener("click", () => openItem(b.dataset.pid)));
-  panel.querySelectorAll("[data-case]").forEach((b) => b.addEventListener("click", () => openCase(b.dataset.case)));
+  panel.querySelector(".back")?.addEventListener("click", () => closePanel());
+  panel.querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", (ev) => { viaKeyboard(ev); openEntity(b.dataset.entity); }));
+  panel.querySelectorAll("[data-pid]").forEach((b) => b.addEventListener("click", (ev) => { viaKeyboard(ev); openItem(b.dataset.pid); }));
+  panel.querySelectorAll("[data-case]").forEach((b) => b.addEventListener("click", (ev) => { viaKeyboard(ev); openCase(b.dataset.case); }));
   panel.scrollTop = 0;
+  if (state.kbOpen) panel.focus();
+  state.kbOpen = false;
+}
+
+// Keyboard activation (Enter, Space, or a click event without pointer) moves focus into the panel.
+function viaKeyboard(ev) {
+  state.kbOpen = !ev || ev.detail === 0;
+}
+
+// Back to the overview; focus returns to the row or dot that opened the panel.
+function closePanel() {
+  const back = state.returnTo;
+  state.returnTo = null;
+  openHome(false);
+  if (back && back.isConnected && back !== document.body) back.focus();
+  else $("#panel").focus();
 }
 
 function openHome(focus) {
   const total = data.items.length;
   select(null, `
-    <p>Each dot is one of ${total} press clippings that Stefan Zweig kept, catalogued by the Literaturarchiv Salzburg with one line of free text for where each appeared. Switch between the catalogue's spellings and the modelled periodicals, or open a row or a dot.</p>
+    <p>Each dot is one of ${total} press clippings that Stefan Zweig kept, catalogued by the Literaturarchiv Salzburg with one line of free text for where each appeared. Switch between the catalogue's lines and the periodicals joined from them, or open a row or a dot.</p>
     <button type="button" class="case" data-case="frankfurter"><strong>Four place forms, one newspaper</strong>The Frankfurter Zeitung, written with Frankfurt, Frankfurt a. M., Frankfurt am Main and without place.</button>
-    <button type="button" class="case" data-case="morgen"><strong>One title, two periodicals</strong>Der Morgen in Berlin and Der Morgen in Wien, which a spelling alone would join.</button>
+    <button type="button" class="case" data-case="morgen"><strong>One title, two periodicals</strong>Der Morgen in Berlin and Der Morgen in Wien, which the title alone would join.</button>
   `);
   if (focus) $("#panel").focus();
 }
@@ -431,8 +450,8 @@ function openItem(pid) {
     <h2>${esc(it.title)}</h2>
     ${img}
     <div class="compare">
-      <div><div class="k">Catalogue</div>${it.raw ? `<span class="str">${esc(it.raw)}</span>` : "<em>no reference</em>"}</div>
-      <div><div class="k">Model</div>${model}</div>
+      <div><div class="k">Catalogue line</div>${it.raw ? `<span class="str">${esc(it.raw)}</span>` : "<em>no reference</em>"}</div>
+      <div><div class="k">Read by the parser as</div>${model}</div>
     </div>
     ${it.decisions.map((d) => `<p class="decision">${icon(d.kind === "alias" ? "merge" : d.kind)}<span>${esc(d.text)}</span></p>`).join("")}
     <p><span class="status">machine-parsed, not verified</span></p>
@@ -469,7 +488,10 @@ function moveFocus(delta) {
 }
 
 function wire() {
-  document.querySelectorAll(".mode button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  document.querySelectorAll(".mode button").forEach((b) => {
+    b.addEventListener("click", () => setMode(b.dataset.mode));
+    b.tabIndex = b.dataset.mode === state.mode ? 0 : -1;
+  });
   $(".mode").addEventListener("keydown", (ev) => {
     if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") {
       const next = state.mode === "catalogue" ? "model" : "catalogue";
@@ -498,6 +520,7 @@ function wire() {
       moveFocus(state.focusIndex < 0 ? 1 : map[ev.key]);
       ev.preventDefault();
     } else if ((ev.key === "Enter" || ev.key === " ") && state.focusIndex >= 0) {
+      state.kbOpen = true;
       openItem(orderedItems()[state.focusIndex].pid);
       ev.preventDefault();
     } else if (ev.key === "Escape") {
@@ -506,7 +529,7 @@ function wire() {
   });
   svg.addEventListener("blur", () => { $("#tip").hidden = true; dotEls.forEach((c) => c.classList.remove("kfocus")); });
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && state.selected && !document.querySelector(".about:popover-open")) openHome(false);
+    if (ev.key === "Escape" && state.selected && !document.querySelector(".about:popover-open")) closePanel();
   });
   let t;
   window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { state.instant = true; render(); }, 120); });
