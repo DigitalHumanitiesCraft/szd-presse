@@ -11,8 +11,8 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
   "September", "October", "November", "December"];
 const NOT_READ = [
   { status: "book", label: "book references" },
-  { status: "unread", label: "unread" },
-  { status: "none", label: "without reference" },
+  { status: "unread", label: "unread lines" },
+  { status: "none", label: "without publication line" },
 ];
 
 const $ = (sel) => document.querySelector(sel);
@@ -70,7 +70,7 @@ function buildRows() {
   }
   const restForms = new Set(periodicals.filter((it) => !shownIds.has(it.entity)).map(written));
   const catalogue = [...forms.values()].sort((a, b) => a.label.localeCompare(b.label, "de"));
-  catalogue.push({ key: "rest", kind: "rest", label: `${restForms.size} further strings`, entities: rest });
+  catalogue.push({ key: "rest", kind: "rest", label: `${restForms.size} further spellings`, entities: rest });
   catalogue.push({ key: "notread", kind: "notread", label: "Not read as a periodical" });
 
   rowOf = (it, mode) => {
@@ -89,14 +89,14 @@ function measure() {
   const axisH = 26;
   let height;
   if (narrow) {
-    height = rows.length * (state.mode === "model" ? 30 : 24) + axisH;
+    height = rows.reduce((a, r) => a + weightOf(r), 0) * 46 + axisH;
     fig.style.blockSize = `${height}px`;
   } else {
     fig.style.blockSize = "";
     height = fig.clientHeight;
   }
   const labelW = Math.min(narrow ? width * 0.46 : width * 0.36, 400);
-  const countW = 40;
+  const countW = window.matchMedia("(max-width: 480px)").matches ? 0 : 40;
   return { width, height, axisH, labelW, countW, narrow, plotX0: labelW + 8, plotX1: width - countW - 6 };
 }
 
@@ -153,7 +153,7 @@ function geometry(rows, L) {
   const total = rows.reduce((a, r) => a + weightOf(r), 0);
   const unit = (L.height - L.axisH) / total;
   const byKey = new Map();
-  let y = 0;
+  let y = L.axisH;
   for (const row of rows) {
     const h = weightOf(row) * unit;
     byKey.set(row.key, { y, h });
@@ -197,10 +197,10 @@ function render() {
   grid.replaceChildren();
   const axis = svg.querySelector(".axis");
   axis.replaceChildren();
-  for (let y = 1900; y <= 1940; y += L.narrow ? 20 : 10) {
+  for (let y = 1900; y <= 1940; y += 20) {
     const x = xOf({ year: y, month: 1, day: 1 }, L);
-    svgEl("line", { x1: x, x2: x, y1: 0, y2: P.geo.byKey.get("notread").y }, grid);
-    const t = svgEl("text", { x, y: plotH + 18, "text-anchor": "middle" }, axis);
+    svgEl("line", { x1: x, x2: x, y1: L.axisH - 4, y2: P.geo.byKey.get("notread").y }, grid);
+    const t = svgEl("text", { x, y: 15, "text-anchor": "middle" }, axis);
     t.textContent = y;
   }
   const rowsG = svg.querySelector(".rows");
@@ -242,9 +242,18 @@ function render() {
   state.instant = false;
   renderLabels(rows, L, P);
   applySelection();
+  renderKey();
   $("#chart-desc").textContent = mode === "model"
     ? "Rows are periodicals with their place; dots are clippings placed by date."
     : "Rows are the publication strings exactly as written in the catalogue; dots are clippings placed by date.";
+}
+
+// Key beside the switch: says what the colours and the two signs mean in the current mode.
+function renderKey() {
+  const sw = (c, t) => `<span class="sw c-text-${c}"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>${t}</span>`;
+  $("#key").innerHTML = state.mode === "model"
+    ? `Place of publication ${sw("Wien", "Wien")} ${sw("Berlin", "Berlin")} ${sw("other", "other places")} ${sw("unknown", "unknown")}<span class="sw">${icon("merge")}spellings joined</span><span class="sw">${icon("split")}one title, two periodicals</span>`
+    : `<span class="sw c-text-unknown"><svg aria-hidden="true" width="12" height="12"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>a clipping; the catalogue line gives no place a reader could group by</span>`;
 }
 
 function renderLabels(rows, L, P) {
@@ -320,7 +329,7 @@ function setMode(mode) {
   state.mode = mode;
   document.querySelectorAll(".mode button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === mode)));
   render();
-  $("#live").textContent = mode === "model" ? "Showing one row per periodical." : "Showing one row per catalogue string.";
+  $("#live").textContent = mode === "model" ? "Showing one row per periodical." : "Showing one row per catalogue spelling.";
 }
 
 function selectRow(row) {
@@ -344,9 +353,9 @@ function select(sel, html) {
 function openHome(focus) {
   const total = data.items.length;
   select(null, `
-    <p>Each dot is one of the ${total} clippings and references in the Aufsatzablage of the Stefan Zweig estate. Switch between the catalogue's strings and the modelled periodicals, or open a row or a dot.</p>
+    <p>Each dot is one of ${total} press clippings that Stefan Zweig kept, catalogued by the Literaturarchiv Salzburg with one line of free text for where each appeared. Switch between the catalogue's spellings and the modelled periodicals, or open a row or a dot.</p>
     <button type="button" class="case" data-case="frankfurter"><strong>Four place forms, one newspaper</strong>The Frankfurter Zeitung, written with Frankfurt, Frankfurt a. M., Frankfurt am Main and without place.</button>
-    <button type="button" class="case" data-case="morgen"><strong>One title, two periodicals</strong>Der Morgen in Berlin and Der Morgen in Wien, which a string alone would join.</button>
+    <button type="button" class="case" data-case="morgen"><strong>One title, two periodicals</strong>Der Morgen in Berlin and Der Morgen in Wien, which a spelling alone would join.</button>
   `);
   if (focus) $("#panel").focus();
 }

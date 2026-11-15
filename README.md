@@ -1,0 +1,40 @@
+# Zweig Press Clippings
+
+One instrument that shows what modelling does to a source collection. Stefan Zweig kept a collection of press clippings, catalogued by the Literaturarchiv Salzburg with one line of free text for where each piece appeared. The page shows the same clippings once grouped by those catalogue spellings and once grouped by periodicals modelled with place and date, and it shows every join and every line it does not read.
+
+## Run locally
+
+```bash
+python -m http.server 8731 --directory docs
+```
+
+Then open http://localhost:8731/.
+
+## Rebuild the data
+
+```bash
+python scripts/extract.py data/source_aufsatzablage_tei.xml data/records.json
+python scripts/model.py data/records.json data/aliases.json docs/img docs/data/clippings.json
+python -m pytest tests
+```
+
+`scripts/fetch_facsimiles.py` downloads and reduces the first facsimile page of each clipping from GAMS; it skips files already present.
+
+## Layout
+
+- `docs/` is the site and the only folder meant to be served.
+- `scripts/` parse and model the catalogue; no language model is involved.
+- `data/` holds the source copy, the extracted records and the editorial joins with their reasons.
+- `knowledge/` documents project, data, specification, design and journal.
+
+## Status
+
+Research prototype, built with coding agents following [Promptotyping](https://dhcraft.org/Promptotyping/). Parsed fields and joins are machine-made proposals and have not been checked against the facsimiles.
+
+## Licence
+
+- Code: MIT, see `LICENSE`.
+- Text and documentation: CC BY 4.0.
+- Shared web files in `docs/assets/dhcraft/`: MIT; fonts under the SIL Open Font License; the DHCraft logo is not licensed for reuse.
+- Catalogue data (`data/source_aufsatzablage_tei.xml` and what is derived from it): Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY-NC 4.0 as stated in the TEI header.
+- Facsimiles in `docs/img/`: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0 as stated in the imprint of stefanzweig.digital, reduced in size.
