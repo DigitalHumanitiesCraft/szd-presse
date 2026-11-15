@@ -137,6 +137,9 @@ code { font-family: var(--dh-font-mono); }
 .group-toggle { position: absolute; inset-block-start: 6px; inset-inline-start: var(--dh-space-4); pointer-events: auto; padding: 2px var(--dh-space-3); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-pill); background: var(--dh-surface); font-size: var(--dh-step--1); font-weight: 600; }
 .group-toggle[aria-pressed="true"] { background: var(--dh-accent); color: var(--dh-on-accent); border-color: var(--dh-accent); }
 .ybar { fill: var(--dh-line-strong); }
+/* Same text style as the axis, with a halo so it reads over the year bars. */
+.annot { paint-order: stroke; stroke: var(--dh-ground); stroke-width: 4px; }
+.leader { stroke: var(--dh-ink-soft); stroke-width: 1; stroke-dasharray: 2 2; }
 .restband { fill: var(--dh-ground-alt); }
 .rowlabel.city .sw { margin-inline-end: 2px; }
 .tip { position: absolute; z-index: 5; max-inline-size: 24rem; padding: var(--dh-space-2) var(--dh-space-3); background: var(--dh-surface); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-s); box-shadow: 0 4px 16px rgb(0 0 0 / .12); font-size: var(--dh-step--1); pointer-events: none; }

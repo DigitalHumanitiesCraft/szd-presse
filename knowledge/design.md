@@ -41,13 +41,17 @@ One header row: brand, status pill, a small segmented switch Normalise and Explo
 
 ## Visualisation logic
 
-- Explore: one mark per placed clipping, rows for the twelve largest periodicals plus every split periodical, the rest in one row; every decade labelled. Clippings without a place are not drawn on the time axis.
-- Normalise groups: "The text cannot decide" (split titles; each line not parsed as its own row with title, signature, catalogue line and facsimile), "Place inferred, alias or supplement", "Joined by rule", "Set aside by rule" (book references, no publication line), "Unchanged" (counted, can be opened). Only the catalogue forms that differ from the modelled periodical appear as chips.
+- Explore: one mark per placed clipping. Rows are chosen by count under the active filter, the twelve largest first, the rest in a shaded row labelled "Remainder"; a split title carries its sign on its row and gets no guaranteed row. A button "Group by city" turns the rows into places ranked by count; a place row filters both views to that place, and its periodicals get their own rows. A strip above the rows shows exact bars per year for the clippings under the filter. Marks that fall into the same slot are stacked, centred on the row, and each row is as tall as its highest stack needs, so no mark lies on another; the mark size shrinks until all rows fit the stage. Every decade labelled. Clippings without a place are not drawn on the time axis.
+- Normalise groups, all listed, none behind an expander: "One title, two places" (split titles), "Possible same periodical, not joined" (candidates from stated criteria in scripts/candidates.py: a supplement beside its paper, a title within a combined title, an unparsed line that begins with a known title, near-identical titles; each row shows both sides, the criterion as its sign with its name, and facsimile previews), "Not parsed: title known, date or issue unread", "Not parsed: no periodical named", "Place inferred, alias or supplement", "Joined by rule", "Set aside by rule", "Unchanged, one form each". Only the catalogue forms that differ from the modelled periodical appear as chips.
 - One sign per kind of case everywhere: spelling folded (arrow), editorial alias (pen), title split (fork), place inferred (pin), supplement (pages), not parsed, book reference, no publication line.
 - Counts: places are disjoint and sum to the placed clippings; kinds of case overlap. Both come from `data.counts`, written and tested by `scripts/model.py` and `tests/test_rules.py`.
 - Status: every statement is a proposal by rule; this is said once, in the side panel. No mark or key shows a confirmed state, since nobody has reached it.
 
 ## Measurements
+
+After stage 2 and the fresh reader (2026-11-15): Normalise passes at 1280 (58) and 360 (17); Explore passes at 360 (20) and measures 78 text elements at 1280, over the limit of 70 and within the 83 the operator accepted.
+
+Earlier state:
 
 `tools/check_ui_density.cjs`, profile `work`, 2026-11-15 after stage 1: Normalise passes at 1280 (64 text elements) and 360 (18); Explore passes at 360 (19) and exceeds the limit at 1280 with 83 text elements against 70. The excess comes from the visible case names (his request), the two side panel labels with the note on clippings not placed and the status line (review points 3 and 14), the alias and supplement entries (review point 7) and every decade on the axis (review point 6), less the removed remainder lanes. Accepted by the operator for this state: asked by the Research Coordination, verbatim, „Nimmst du die Überschreitung an, und soll die Session jetzt aus Stufe 2 die Liste der möglichen Zusammenführungen und die Übersicht nach Stadt und Jahr bauen?“, he answered „ja ja“ (2026-11-15). The acceptance covers these 83 text elements in Explore at 1280, not further growth; anything added later is measured and reported again.
 

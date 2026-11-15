@@ -24,7 +24,7 @@ const CASES = [
   { key: "alias", icon: "alias", label: "editorial alias", tip: "a written title or place read as another by a stated editorial decision" },
   { key: "split", icon: "split", label: "title split", tip: "one title written with two places, taken as two periodicals" },
   { key: "infer", icon: "infer", label: "place inferred", tip: "no place written; taken from the other lines of the same periodical" },
-  { key: "supplement", icon: "supp", label: "supplement", tip: "a supplement written into the place, kept as a periodical of its own" },
+  { key: "supplement", icon: "supp", label: "supplement kept apart", tip: "a supplement written into the place, kept as a periodical of its own" },
   { key: "unread", icon: "unread", label: "not parsed", tip: "the parser leaves the line as it is rather than guess" },
   { key: "book", icon: "book", label: "book reference", tip: "the line names a book, not a periodical" },
   { key: "none", icon: "none", label: "no publication line", tip: "the record names no publication" },
@@ -120,7 +120,7 @@ function renderRail() {
   };
   $("#rail").innerHTML = `
     <div class="rail-group" role="group" aria-label="Place of publication, each placed clipping once">
-      <p class="rail-label">Place, each clipping once; ${c.notPlaced} not placed</p>
+      <p class="rail-label">Place, each clipping once; ${c.notPlaced} without a place (not parsed, book, no line)</p>
       ${PLACES.map((p) => btn("place", p.key, `<span class="sw city-${p.key}" aria-hidden="true"></span><span class="rl">${esc(p.label)}</span>`, `clippings in periodicals of ${p.label}`, c.places[p.key] ?? 0, p.label)).join("")}
     </div>
     <div class="rail-group" role="group" aria-label="Kinds of case, a clipping can have several">
@@ -219,7 +219,7 @@ function renderNormalise() {
   $("#normalise").innerHTML =
     group("One title, two places", splits.map(entRow)) +
     group("Possible same periodical, not joined", cands.map(candRow)) +
-    group("Not parsed: title known, date or issue unread", dateUnread.map(itemRow)) +
+    group("Not parsed: date or issue unread", dateUnread.map(itemRow)) +
     group("Not parsed: no periodical named", noPeriodical.map(itemRow)) +
     group("Place inferred, alias or supplement", inferred.map(entRow)) +
     group("Joined by rule", joined.map(entRow)) +
@@ -255,7 +255,8 @@ function exploreRows() {
   const counts = new Map();
   for (const it of placed) counts.set(groupOf(it), (counts.get(groupOf(it)) ?? 0) + 1);
   const keys = [...counts.keys()].sort((a, b) => counts.get(b) - counts.get(a) || a.localeCompare(b, "de"));
-  const shown = keys.length > MAX_ROWS + 1 ? keys.slice(0, MAX_ROWS) : keys;
+  // By city every place gets its row, so a question such as "which Swiss places" is answered on screen.
+  const shown = state.byCity || keys.length <= MAX_ROWS + 1 ? keys : keys.slice(0, MAX_ROWS);
   const ids = new Set(shown);
   const rows = shown.map((k) => (state.byCity
     ? { key: k, kind: "city", city: k.slice(5), count: counts.get(k) }
@@ -325,7 +326,8 @@ function renderExplore() {
   let rad = 8;
   let st;
   let need;
-  const minRow = narrow ? 44 : 26;
+  // Rows by city are many and short, so they may be flatter than rows by periodical.
+  const minRow = narrow ? 44 : state.byCity ? Math.max(14, Math.min(26, (avail - 80) / rows.length)) : 26;
   for (let i = 0; i < 12; i += 1) {
     st = stackRows(rows, rowOf, placed, L, rad);
     need = rows.map((r) => Math.max(minRow, st.maxStack.get(r.key) * rad * 2.05 + rad));
@@ -334,11 +336,12 @@ function renderExplore() {
     rad = Math.max(2.5, rad * Math.sqrt(avail / total) * 0.98);
   }
   const total = need.reduce((a, b) => a + b, 0);
-  const extra = Math.max(0, avail - total) / rows.length;
+  // Spare height goes to the rows only up to a calm maximum; the rest stays empty below.
+  const extra = Math.min(Math.max(0, avail - total) / rows.length, 40);
   const geo = new Map();
   let y = top;
   rows.forEach((r, i) => { const h = need[i] + extra; geo.set(r.key, { y, h }); y += h; });
-  const font = Math.max(13, Math.min(20, minRow * 0.62 + extra * 0.1));
+  const font = Math.max(12, Math.min(20, minRow * 0.62 + extra * 0.1));
 
   const svg = $("#chart");
   svg.setAttribute("width", L.width);
@@ -373,6 +376,15 @@ function renderExplore() {
       const off = (k - (its.length - 1) / 2) * rad * 2.05;
       pos.set(it.pid, { x: xOf(it.date, L), y: g.y + g.h / 2 + off });
     });
+  }
+  // Annotation: the latest clipping under the filter, named at its mark.
+  const latest = placed.filter((it) => pos.has(it.pid)).sort((a, b) => xKey(b) - xKey(a))[0];
+  if (latest) {
+    const p = pos.get(latest.pid);
+    const e = data.entityById.get(latest.entity);
+    // Named in the year strip above the rows, with a leader to its mark, so it never sits in the marks.
+    svgEl("line", { x1: p.x, x2: p.x, y1: L.axisH + 8, y2: p.y - rad, class: "leader" }, svg);
+    svgEl("text", { x: p.x - 4, y: L.axisH + 12, "text-anchor": "end", class: "axis annot" }, svg).textContent = `latest: ${e.label}, ${e.place ?? "place unknown"}, ${dateText(latest.date)}`;
   }
   const dots = svgEl("g", {}, svg);
   dotEls = new Map();

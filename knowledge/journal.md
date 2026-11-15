@@ -23,6 +23,15 @@ template: journal
 
 ## Entries
 
+### 2026-11-15 Stage 2: possible same periodicals, place and year
+
+- Trigger: the operator accepted the Explore excess for the stage 1 state (83 text elements) and asked for two parts of stage 2.
+- Built: scripts/candidates.py with four stated criteria (supplement beside its paper, title within a combined title, unparsed line beginning with a known title, near-identical titles); nine candidates, none near-identical, nothing joined; exported as candidates-same-periodical. Unparsed lines by cause. Normalise without expander. Explore: group by city with a city filter, all places listed by city, exact bars per year, rows by count under the filter, stacked marks without overlap, an annotation naming the latest clipping, a shaded remainder row.
+- Fresh reader, four tasks from the data reviewer's evaluation design, screenshots only. Right: the five unparsed lines with a known title (with a doubt caused by the heading "Not parsed: title known, ..."); a supplement is not joined, only proposed, by the supplement criterion. Partly right: Swiss periodicals, three of seven, because Genf and Bern sat in the remainder. Not solvable: the latest clipping, which sat unnamed in the remainder.
+- Changed after the reader: heading "Not parsed: date or issue unread"; every place listed when grouped by city; the latest clipping named in the year strip with a leader; "supplement kept apart" in the side panel against the three supplement candidates; the side panel explains the 34 clippings without a place; spare height no longer stretches filtered rows apart.
+- Evidence: 29 tests (tests/test_candidates.py new); keyboard script 22 of 22 including group by city and city filter; viewer script 6 of 6; no identical mark positions at 1280, 1024 and 1620 in the city grouping; density in design.md.
+- Open: no second fresh reader after these changes; the side panel's case counts stay counts of the whole collection under a filter (a reader took them for unresponsive filters).
+
 ### 2026-11-15 Three independent reviews, stage 1 corrections
 
 - Trigger: three read-only reviews started by the Research Coordination (interface and text; CSS, design system and code; data against the facsimiles with an evaluation design), checked and passed on by the coordination as stage 1.

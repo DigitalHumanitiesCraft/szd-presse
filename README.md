@@ -20,6 +20,8 @@ python -m pytest tests
 node tests/ui/keyboard.cjs   # browser checks against the local server, needs Playwright
 ```
 
+`scripts/candidates.py` proposes possible same periodicals by stated criteria without joining them; the export writes them to `docs/data/export/candidates-same-periodical.*`.
+
 `scripts/fetch_facsimiles.py` downloads and reduces the first facsimile page of each clipping from GAMS; it skips files already present.
 
 ## Layout
