@@ -31,6 +31,7 @@
   <symbol id="i-combined" viewBox="0 0 24 24"><rect x="3" y="6" width="8" height="12" rx="1"/><rect x="13" y="6" width="8" height="12" rx="1"/><path d="M14 4 10 20"/></symbol>
   <symbol id="i-prefix" viewBox="0 0 24 24"><path d="M4 7h7M4 12h7M4 17h7"/><path d="M15 7h5v10h-5z"/></symbol>
   <symbol id="i-near" viewBox="0 0 24 24"><path d="M4 9h7M4 15h7M13 9h7M13 15h4"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 </svg>
 <a class="dh-skip" href="#stage">Skip to the figure</a>
@@ -98,13 +99,14 @@
   <p>The Aufsatzablage of the Stefan Zweig estate in the Literaturarchiv Salzburg holds Zweig's own collection of press clippings. Its catalogue records where a piece appeared as one line of free text, for example <q>Neue Freie Presse, Wien, 3. 5. 1911, S. 2</q>. As text, the same newspaper can be written in several ways, and two newspapers can share a name.</p>
   <p>This tool reads every such line with a deterministic parser into periodical, place, date and page, then joins the lines into periodicals. Case, a leading article and the spelling Litteratur are ignored automatically; a few further joins are editorial decisions, each shown with its reason. Lines the parser cannot read, book references and clippings without a reference stay visible as their own group. Nothing is guessed. Every join is a proposal by rule until a person confirms it; deciding in the tool is the next step of its development. The modelled data can be downloaded under Data.</p>
   <p>Normalise lists the rules' proposals, one row per proposed periodical with the catalogue forms it joins and their counts. The first group holds what needs an expert, marked by a sign in the row: a title split by place (fork), a place inferred from other lines (pin), an editorial alias (pen), and the lines the parser could not read. The rail counts clippings; a clipping with several kinds of case counts under each. Explore shows the modelled clippings by periodical and year. The rail on the left is legend and filter for both; a selected entry filters both views.</p>
-  <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The tool was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
+  <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The clippings print texts by third parties; whether the archive's CC BY statement covers them has not been established. The tool was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
 </div>
 
 <footer class="dh-foot site-foot">
   <div class="dh-foot__frame">
     <p class="dh-foot__brand"><img src="assets/dhcraft/dhcraft-mark-watercolor-128.png" alt="" width="28" height="32"><span><strong>Zweig Press Clippings</strong><br>A tool by <a href="https://dhcraft.org">Digital Humanities Craft</a></span></p>
     <nav class="dh-foot__links" aria-label="Project">
+      <a class="dh-icon-link" href="https://github.com/DigitalHumanitiesCraft/szd-presse"><svg class="dh-icon" aria-hidden="true"><use href="#i-code"/></svg>Source code</a>
       <a class="dh-icon-link" href="https://stefanzweig.digital"><svg class="dh-icon" aria-hidden="true"><use href="#i-ext"/></svg>Stefan Zweig Digital</a>
       <a class="dh-icon-link" href="https://dhcraft.org/Promptotyping/"><svg class="dh-icon" aria-hidden="true"><use href="#i-ext"/></svg>Promptotyping</a>
       <a class="dh-icon-link" href="https://dhcraft.org/imprint/"><svg class="dh-icon" aria-hidden="true"><use href="#i-info"/></svg>Imprint</a>

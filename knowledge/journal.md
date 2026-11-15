@@ -14,7 +14,7 @@ template: journal
 
 ## Open
 
-- Publication waits for the operator's word: creating a public GitHub repository, setting the remote and switching on Pages (folder `docs/` on `main`). Until then the footer has no source-code link; add it when the repository exists.
+- Publication: released by the operator after his acceptance (relayed by the Research Coordination). Creating the public repository and switching on Pages are steps he carries out himself under his standing instructions; the footer link to https://github.com/DigitalHumanitiesCraft/szd-presse is in place for that address.
 - Licence conflict to confirm: the TEI catalogue says CC BY-NC 4.0, the stefanzweig.digital imprint says all content CC BY 4.0. The site follows each statement for its own material (catalogue-derived data BY-NC, facsimiles BY). The facsimiles reproduce printed texts of third parties, whose rights the archive's statement may not cover.
 - No parsed field and no join has been checked against the facsimiles. Status of all of them: proposal (agent, 2026-11-15).
 - The rebuilt frame has not been seen by the operator. The columns variant from the GOSSIP role field is off the table for the talk and may return as its own idea.

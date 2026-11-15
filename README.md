@@ -38,9 +38,10 @@ Research prototype, built with coding agents following [Promptotyping](https://d
 ## Licence
 
 - Code: MIT, see `LICENSE`.
-- Text and documentation: CC BY 4.0.
+- Text and documentation: CC BY 4.0, see `LICENSE-TEXT.md`.
 - Shared web files in `docs/assets/dhcraft/`: MIT; fonts under the SIL Open Font License; the DHCraft logo is not licensed for reuse.
 - OpenSeadragon 6.0.2 in `docs/vendor/openseadragon/`: BSD 3-Clause, see its `LICENSE.txt` and `PROVENANCE.md`.
 - The deep-zoom viewer loads images at view time from the IIIF service of GAMS (University of Graz); they are not part of this repository.
 - Catalogue data (`data/source_aufsatzablage_tei.xml` and what is derived from it): Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY-NC 4.0 as stated in the TEI header.
 - Facsimiles in `docs/img/`: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0 as stated in the imprint of stefanzweig.digital, reduced in size.
+- Two points are open and stated here deliberately: the catalogue data and everything derived from them stand under CC BY-NC 4.0 as the TEI header says, which differs from the CC BY 4.0 of the imprint; and the clippings print texts by third parties whose rights the archive's CC BY statement may not cover, which has not been established.
