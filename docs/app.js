@@ -1,7 +1,7 @@
 // Zweig Press Clippings: two views on one dataset. Normalise lists the rules' proposals for joining
 // catalogue lines into periodicals, the uncertain first; Explore shows the modelled clippings by
 // periodical and year. The rail is legend and filter for both. Data are prebuilt by scripts/model.py.
-"use strict";
+import { openViewer, closeViewer, isOpen, wireViewer } from "./viewer.js";
 
 const SVGNS = "http://www.w3.org/2000/svg";
 const YEAR_MIN = 1900;
@@ -351,6 +351,7 @@ function setView(view) {
 
 // Detail panel: opens on a selection and closes again, so the figure keeps the full width.
 function openPanel(sel, html, trigger) {
+  closeViewer();
   state.selected = sel;
   state.returnTo = trigger ?? null;
   const panel = $("#panel");
@@ -365,6 +366,7 @@ function openPanel(sel, html, trigger) {
 }
 
 function closePanel() {
+  closeViewer();
   const back = state.returnTo;
   state.selected = null;
   state.returnTo = null;
@@ -410,7 +412,10 @@ function openLoose(kind, trigger) {
 function openItem(pid, trigger) {
   const it = data.items.find((x) => x.pid === pid);
   const e = it.entity && data.entityById.get(it.entity);
-  const img = it.image ? `<figure class="facs"><a href="${GAMS}${esc(pid)}"><img src="img/${esc(pid.replace(":", "_"))}.jpg" alt="First page of the clipping ${esc(it.signature)}" loading="lazy"></a><figcaption>Facsimile: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0</figcaption></figure>` : "";
+  const local = it.image ? `img/${pid.replace(":", "_")}.jpg` : "";
+  const img = `<figure class="facs">${local ? `<button type="button" class="facs-open" data-zoom="${esc(pid)}" aria-label="Read the facsimile of ${esc(it.signature)}"><img src="${esc(local)}" alt="" loading="lazy"></button>` : ""}
+    <button type="button" class="zoom-btn" data-zoom="${esc(pid)}">${icon("zoom")}Read the facsimile</button>
+    <figcaption>Facsimile: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0</figcaption></figure>`;
   let model;
   if (e) {
     const bits = [it.date && dateText(it.date), it.issue, it.pages && `p. ${it.pages}`].filter(Boolean).map(esc).join(", ");
@@ -429,6 +434,8 @@ function openItem(pid, trigger) {
     ${img}
     <p><a class="dh-icon-link" href="${GAMS}${esc(pid)}">Facsimile in Stefan Zweig Digital ${icon("ext")}</a></p>
   `, trigger);
+  $("#panel").querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", () =>
+    openViewer({ pid, localSrc: local, label: it.signature, returnTo: b })));
 }
 
 function showTip(it, p) {
@@ -487,7 +494,10 @@ function wire() {
   });
   svg.addEventListener("blur", () => { $("#tip").hidden = true; dotEls.forEach((c) => c.classList.remove("kfocus")); });
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && !$("#panel").hidden && !document.querySelector(".about:popover-open")) closePanel();
+    if (ev.key !== "Escape" || document.querySelector(".about:popover-open")) return;
+    // The viewer closes first and gives focus back to its button; a second Escape closes the panel.
+    if (isOpen()) { closeViewer(); return; }
+    if (!$("#panel").hidden) closePanel();
   });
   let t;
   window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (state.view === "explore") renderExplore(); }, 120); });
@@ -507,6 +517,7 @@ async function main() {
   $("#loading").hidden = true;
   $("#work").hidden = false;
   wire();
+  wireViewer();
   // The address carries the view, so a link or a reload opens Explore directly.
   setView(location.hash === "#explore" ? "explore" : "normalise");
 }
