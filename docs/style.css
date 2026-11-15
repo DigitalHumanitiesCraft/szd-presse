@@ -60,9 +60,6 @@ code { font-family: var(--dh-font-mono); }
 .rail-item .n, .prop-n, .n { font-variant-numeric: tabular-nums; color: var(--dh-ink-soft); }
 .rail-item .dh-icon { color: var(--dh-accent); }
 .rail-item .tipbox { inset-block-start: 0; inset-inline-start: calc(100% + 8px); }
-.rail-group.cases { flex-direction: row; flex-wrap: wrap; gap: var(--dh-space-1); }
-.rail-group.cases .rail-item { inline-size: auto; flex: 0 0 calc(50% - var(--dh-space-1)); }
-.rail-group.cases .tipbox { inset-block-start: calc(100% + 4px); inset-inline-start: 0; }
 .rail-reset { align-self: flex-start; border: 1px solid var(--dh-accent); border-radius: var(--dh-radius-pill); background: none; padding: 2px var(--dh-space-3); color: var(--dh-link); font-size: var(--dh-step--1); }
 .rail-status { margin: auto 0 0; font-size: var(--dh-step--1); color: var(--dh-ink-soft); }
 .sw { flex: none; display: inline-block; inline-size: .8rem; block-size: .8rem; border-radius: 50%; }
@@ -81,17 +78,24 @@ code { font-family: var(--dh-font-mono); }
 /* Rows separated by hairlines, no boxes; the accent bar marks the hovered and the selected row. */
 .props { list-style: none; margin: 0; padding: 0; }
 .props li + li { border-block-start: var(--dh-hairline) solid var(--dh-line); }
-.prop { display: block; inline-size: 100%; text-align: start; padding: var(--dh-space-2) var(--dh-space-3); border: 0; border-inline-start: 4px solid transparent; background: none; }
+/* Text on the left, the facsimile previews in the free right part of the row. */
+.prop { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head prev" "chips prev"; column-gap: var(--dh-space-5); align-items: start; inline-size: 100%; text-align: start; padding: var(--dh-space-2) var(--dh-space-3); border: 0; border-inline-start: 4px solid transparent; background: none; }
 .prop:hover { border-inline-start-color: var(--dh-line-strong); }
 .prop:hover .prop-name { text-decoration: underline; }
 .prop.on { border-inline-start-color: var(--dh-accent); }
 .prop.on .prop-name { color: var(--dh-accent); }
-.prop-head { display: flex; align-items: center; gap: var(--dh-space-2); font-size: var(--dh-step-1); }
+.prop-head { grid-area: head; display: flex; align-items: center; gap: var(--dh-space-2); font-size: var(--dh-step-1); }
 .prop-name { font-weight: 600; }
 .prop-place { font-weight: 600; font-size: .85em; }
 .prop-icons { display: inline-flex; gap: 2px; color: var(--dh-accent); }
 .prop-n { margin-inline-start: var(--dh-space-3); font-size: var(--dh-step-0); }
-.chips { display: flex; flex-wrap: wrap; gap: var(--dh-space-1) var(--dh-space-6); margin-block-start: 2px; padding-inline-start: 1.4rem; }
+.previews { grid-area: prev; display: flex; align-items: center; gap: var(--dh-space-1); align-self: start; margin-block-start: var(--dh-space-1); }
+.previews img { block-size: 3.2rem; inline-size: 2.4rem; object-fit: cover; object-position: top; border: 1px solid var(--dh-line); background: var(--dh-ground-alt); }
+.previews img:hover { outline: 2px solid var(--dh-accent); outline-offset: 1px; }
+.previews .more { font-size: var(--dh-step--1); color: var(--dh-ink-soft); padding-inline-start: var(--dh-space-1); }
+/* Lines that are not one periodical stand one per line, so two lines never read as one. */
+.prop.loose .chips { flex-direction: column; gap: 2px; }
+.chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: var(--dh-space-1) var(--dh-space-6); margin-block-start: 2px; padding-inline-start: 1.4rem; }
 .chip { font-size: var(--dh-step-0); color: var(--dh-ink); white-space: pre-wrap; }
 .opener { border: 0; background: none; padding: 0; font: inherit; color: var(--dh-link); display: inline-flex; gap: var(--dh-space-2); align-items: baseline; }
 .opener::before { content: "+"; font-family: var(--dh-font-mono); }
@@ -184,6 +188,8 @@ code { font-family: var(--dh-font-mono); }
   .rl-place, .rowcount { display: none; }
   .prop-head { font-size: var(--dh-step-0); flex-wrap: wrap; }
   .prop { padding-block: var(--dh-space-3); }
+  .prop { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "chips" "prev"; }
+  .previews { justify-self: start; margin-block-start: var(--dh-space-2); }
   .chip { font-size: var(--dh-step--1); }
 }
 @media (prefers-reduced-motion: reduce) {

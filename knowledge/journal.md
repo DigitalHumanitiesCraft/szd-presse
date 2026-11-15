@@ -23,6 +23,12 @@ template: journal
 
 ## Entries
 
+### 2026-11-15 Case names in the side panel, facsimile previews in the list
+
+- Trigger: the operator's answer „ja, Namen ins Panel und Faksimile-Vorschau in die Liste“, and the Research Coordination's decision to split the decision group.
+- Changed: case kinds with visible names in the side panel; up to five facsimile previews per proposal row, then the count of the rest, as images inside the row's button (one control per row; a click on a preview opens that clipping); "Needs a decision" split into "The text cannot decide" (split title, lines not parsed) and "Place inferred or alias applied".
+- Evidence: 17 tests; keyboard script 18 of 18; density passes except Explore at 1280 (76 text elements against 70), which yields on the operator's word and is recorded in design.md.
+
 ### 2026-11-15 Frame rebuilt after the operator's rejection
 
 - Trigger: the operator rejected the Model state on his screen ("wieder die gleichen User-Interface-Probleme"); the Research Coordination's analysis named unused space, four levels before the data, colour without meaning in Model, a timeline that played no part in joining, small type, hidden affordances and explanatory text.

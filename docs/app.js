@@ -97,7 +97,7 @@ function renderRail() {
     <div class="rail-group" role="group" aria-label="Place of publication">${PLACES.map((p) =>
       btn("place", p.key, `<span class="sw c-${p.key}" aria-hidden="true"></span><span class="rl">${esc(p.label)}</span>`, `clippings in periodicals of ${p.label}`, placeCount(p.key), p.label)).join("")}</div>
     <div class="rail-group cases" role="group" aria-label="Kind of case">${CASES.map((c) =>
-      btn("case", c.key, `${icon(c.icon)}<span class="vh">${esc(c.label)}</span>`, `${c.label}: ${c.tip}`, caseCount(c.key), c.label)).join("")}</div>
+      btn("case", c.key, `${icon(c.icon)}<span class="rl">${esc(c.label)}</span>`, c.tip, caseCount(c.key), c.label)).join("")}</div>
     ${state.filter ? '<button type="button" class="rail-reset" id="reset">Show all</button>' : ""}`;
   $("#rail").querySelectorAll(".rail-item").forEach((b) => b.addEventListener("click", () => {
     const same = state.filter?.type === b.dataset.type && state.filter.key === b.dataset.key;
@@ -108,12 +108,26 @@ function renderRail() {
   $("#reset")?.addEventListener("click", () => { state.filter = null; refresh(); $("#rail .rail-item").focus(); });
 }
 
+// Facsimile previews in a row: a few small first pages, then the number of the rest. They are
+// images inside the row's button, so a row stays one control; a click on one opens that clipping,
+// the keyboard reaches the same pages through the row's panel.
+const PREVIEWS = 5;
+function previews(items) {
+  const shown = items.filter((it) => it.image).slice(0, PREVIEWS);
+  if (!shown.length) return "";
+  const rest = items.length - shown.length;
+  return `<span class="previews">${shown.map((it) => `<img src="img/${esc(it.pid.replace(":", "_"))}.jpg" alt="Facsimile of ${esc(it.signature)}" loading="lazy" data-pid="${esc(it.pid)}">`).join("")}${rest > 0 ? `<span class="more">+${rest}</span>` : ""}</span>`;
+}
+
 // Normalise: one row per proposal, grouped by what needs an expert first.
 function renderNormalise() {
   const ents = data.entities.filter((e) => e.items.some(matches));
   // Within "needs a decision": a split title first, then an inferred place, then an editorial alias.
   const weight = (e) => (e.split ? 0 : e.items.some((it) => it.kinds.has("infer")) ? 1 : 2);
   const needs = ents.filter((e) => e.needs).sort((a, b) => weight(a) - weight(b) || b.count - a.count);
+  // What a text alone cannot decide comes first as its own block; inferred places and aliases follow.
+  const undecidable = needs.filter((e) => e.split);
+  const inferred = needs.filter((e) => !e.split);
   const joined = ents.filter((e) => !e.needs && e.forms.length > 1).sort((a, b) => b.count - a.count);
   const unchanged = ents.filter((e) => !e.needs && e.forms.length === 1).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "de"));
   const loose = ["unread", "book", "none"].map((k) => ({ kind: k, items: data.items.filter((it) => it.status === k && matches(it)) })).filter((g) => g.items.length);
@@ -126,27 +140,31 @@ function renderNormalise() {
     return `<li><button type="button" class="prop${on ? " on" : ""}" aria-pressed="${on}" data-entity="${esc(e.id)}">
       <span class="prop-head"><span class="sw c-${e.city}" aria-hidden="true"></span><span class="prop-name">${esc(e.label)}</span> <span class="prop-place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>${marks ? `<span class="prop-icons">${marks}</span>` : ""}<span class="prop-n">${e.count}</span></span>
       <span class="chips">${e.forms.map(([f, n]) => `<code class="chip">${esc(f)}  ${n}</code>`).join("")}</span>
+      ${previews(e.items)}
     </button></li>`;
   };
   const looseRow = (g) => {
     const c = CASES.find((x) => x.key === g.kind);
     const on = sel?.type === "loose" && sel.id === g.kind;
-    return `<li><button type="button" class="prop${on ? " on" : ""}" aria-pressed="${on}" data-loose="${g.kind}">
+    return `<li><button type="button" class="prop loose${on ? " on" : ""}" aria-pressed="${on}" data-loose="${g.kind}">
       <span class="prop-head">${icon(c.icon)}<span class="prop-name">${esc(c.label)}</span><span class="prop-n">${g.items.length}</span></span>
       <span class="chips">${g.items.map((it) => `<code class="chip">${esc(it.raw || it.title)}</code>`).join("")}</span>
+      ${previews(g.items)}
     </button></li>`;
   };
   const group = (title, rows) => rows.length ? `<section class="pgroup"><h2>${esc(title)}</h2><ul class="props">${rows.join("")}</ul></section>` : "";
   const needLoose = loose.filter((g) => g.kind === "unread");
   const setAside = loose.filter((g) => g.kind !== "unread");
   $("#normalise").innerHTML =
-    group("Needs a decision", [...needs.map(entRow), ...needLoose.map(looseRow)]) +
+    group("The text cannot decide", [...undecidable.map(entRow), ...needLoose.map(looseRow)]) +
+    group("Place inferred or alias applied", inferred.map(entRow)) +
     group("Joined by rule", joined.map(entRow)) +
     group("Set aside by rule", setAside.map(looseRow)) +
     (unchanged.length ? `<section class="pgroup"><h2><button type="button" class="opener" aria-expanded="${state.showUnchanged}" id="toggle-unchanged">Unchanged, one form each <span class="prop-n">${unchanged.reduce((a, e) => a + e.count, 0)}</span></button></h2>${state.showUnchanged ? `<ul class="props">${unchanged.map(entRow).join("")}</ul>` : ""}</section>` : "") +
     (ents.length || loose.length ? "" : '<p class="state">No clipping matches this filter. Choose "Show all" in the rail.</p>');
-  $("#normalise").querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", () => openEntity(b.dataset.entity, b)));
-  $("#normalise").querySelectorAll("[data-loose]").forEach((b) => b.addEventListener("click", () => openLoose(b.dataset.loose, b)));
+  const preview = (ev, b) => { const img = ev.target.closest("img[data-pid]"); if (img) { openItem(img.dataset.pid, b); return true; } return false; };
+  $("#normalise").querySelectorAll("[data-entity]").forEach((b) => b.addEventListener("click", (ev) => { if (!preview(ev, b)) openEntity(b.dataset.entity, b); }));
+  $("#normalise").querySelectorAll("[data-loose]").forEach((b) => b.addEventListener("click", (ev) => { if (!preview(ev, b)) openLoose(b.dataset.loose, b); }));
   $("#toggle-unchanged")?.addEventListener("click", () => { state.showUnchanged = !state.showUnchanged; renderNormalise(); $("#toggle-unchanged").focus(); });
 }
 
