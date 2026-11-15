@@ -13,7 +13,7 @@ template: project
 
 # Zweig Press Clippings
 
-One instrument that shows what modelling does to a source collection. The press clippings of the Aufsatzablage in the Stefan Zweig estate carry their place of publication as one free-text line per catalogue record; the instrument shows the same clippings once grouped by those strings and once grouped by periodicals modelled with place and date.
+A research tool that carries catalogue data into a modelled schema. The press clippings of the Aufsatzablage in the Stefan Zweig estate carry their place of publication as one free-text line per catalogue record. In Normalise, stated rules propose how these lines join into periodicals with place and date, the uncertain cases and the possible same periodicals first, with the facsimile beside the proposal; in Explore, the modelled clippings are shown by periodical or by city and year. The modelled data, a register of periodicals and the open questions can be downloaded; every statement is a proposal by rule until a person confirms it.
 
 Published on 2026-11-15 at https://dhcraft.org/szd-presse/, source at https://github.com/DigitalHumanitiesCraft/szd-presse.
 
