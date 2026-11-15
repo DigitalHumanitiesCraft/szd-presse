@@ -59,3 +59,20 @@ def test_typos_and_ranges_stay_unread():
                 "Pester Lloyd, Budapest, 17. 10. – 8. 11. 1936",
                 "Münchner Allgemeine Zeitung, München, o. D."):
         assert parse(raw)["status"] == "unread", raw
+
+
+def test_publisher_forms_are_books():
+    for raw in ("Privatdruck, München 1936", "Philipp Reclam jun. 1924",
+                "Gewalt oder Verständigung? Wien, Verlag des Allgemeinen Österreichischen Frauenvereins, 1917, S. 1"):
+        assert parse(raw)["status"] == "book", raw
+
+
+def test_month_range_and_day_range():
+    r = parse("La Belgique artistique et littéraire, Januar–März 1910, S. 7–15")
+    assert (r["status"], r["place"], r["date"]) == ("periodical", None, {"year": 1910, "month": 1})
+    assert parse("Stimmen zur Internationalen Frauenkonferenz in Bern 14.–19. April 1918, S. 3–4")["status"] == "unread"
+
+
+def test_bare_year_is_not_enough():
+    assert parse("Das Buch des Gesamtverbandes Schaffender Künstler Österreichs, Wien, 1929")["status"] == "unread"
+    assert parse("Die Dame, Berlin, Heft 25, 1927, S. 8–9")["status"] == "periodical"

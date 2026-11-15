@@ -15,8 +15,8 @@ MONTHS = {
 }
 _MONTH_ALT = "|".join(MONTHS)
 
-# A book reference names a publisher after "Place:" or carries an editor marker.
-BOOK = re.compile(r"(?:\b[A-ZÄÖÜ][\wäöüß./ -]+:\s*\S)|\b[Hh]rsg\.|\bHerausgegeben\b")
+# A book reference names a publisher after "Place:", a publisher word or an editor marker.
+BOOK = re.compile(r"(?:\b[A-ZÄÖÜ][\wäöüß./ -]+:\s*\S)|\b[Hh]rsg\.|\bHerausgegeben\b|\bVerlag\b|\bPrivatdruck\b|\bjun\.")
 PAGES = re.compile(r",?\s*(?:S\.|Sp\.|Seite|Spalten?)\s*([\d\s–\-.f]+?)\.?\s*$")
 # Trailing edition note such as "(Abendblatt)" or "(erstes Beiblatt)"; kept as issue.
 EDITION = re.compile(r"\s*\(([^()]*[A-Za-zäöü][^()]*)\)\s*$")
@@ -24,7 +24,7 @@ EDITION = re.compile(r"\s*\(([^()]*[A-Za-zäöü][^()]*)\)\s*$")
 # "Jg. 20, Nr. 8 (August 1908)" or "Heft 25, 1927".
 ISSUE = re.compile(r",\s*((?:\d+\.\s*)?(?:Jg\.?|Heft|Nr\.)[^,(]*(?:,\s*(?:Heft|Nr\.)[^,(]*)?)(?:\s*\(([^()]*)\))?\s*,?\s*(\d{4})?\s*$")
 DATE_NUMERIC = re.compile(r"(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\s*$")
-DATE_MONTHNAME = re.compile(rf"(?:(\d{{1,2}})\.\s*)?({_MONTH_ALT})(?:/(?:{_MONTH_ALT}))*\s+(\d{{4}})\s*$", re.IGNORECASE)
+DATE_MONTHNAME = re.compile(rf"(?:(\d{{1,2}})\.\s*)?({_MONTH_ALT})(?:[/–](?:{_MONTH_ALT}))*\s+(\d{{4}})\s*$", re.IGNORECASE)
 DATE_YEAR = re.compile(r"\b(\d{4})\s*$")
 
 
@@ -77,7 +77,11 @@ def parse(raw: str) -> dict:
         text = text[: m.start()].rstrip(" ,")
     date, head = _parse_date(text.rstrip(" ,"))
     parts = [p.strip() for p in head.rstrip(" ,").split(",") if p.strip()]
-    if date is None or not parts or len(parts) > 2:
+    # A dash before the date is a range ("14.–19. April 1918"); a bare year without an issue
+    # cannot tell a periodical from a yearbook. Both stay unread rather than guessed.
+    open_range = head.rstrip().endswith("–")
+    year_only = date is not None and "month" not in date and result["issue"] is None
+    if date is None or not parts or len(parts) > 2 or open_range or year_only:
         result.update(pages=None, issue=None)
         return result
     result.update(status="periodical", periodical=parts[0], date=date,

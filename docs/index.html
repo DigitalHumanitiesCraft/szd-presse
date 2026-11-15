@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Where Stefan Zweig's press clippings were published: the free-text references of the Aufsatzablage modelled as periodicals with place and date.">
+<title>Zweig Press Clippings, catalogue strings and periodicals</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="assets/dhcraft/dhcraft-tokens.css">
+<link rel="stylesheet" href="assets/dhcraft/dhcraft-components.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg class="vh" aria-hidden="true" focusable="false">
+  <symbol id="i-merge" viewBox="0 0 24 24"><path d="M4 5h5l5 7h6M4 19h5l5-7"/><path d="m17 9 3 3-3 3"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><path d="M4 12h6l5-7h5M10 12l5 7h5"/><path d="m17 2 3 3-3 3M17 16l3 3-3 3"/></symbol>
+  <symbol id="i-infer" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><path d="M12 7v3M12 13v.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+</svg>
+<a class="dh-skip" href="#figure">Skip to the figure</a>
+<header class="dh-head site-head">
+  <a class="dh-brand" href="./"><img src="assets/dhcraft/dhcraft-mark-watercolor-128.png" alt="" width="28" height="32">Zweig Press Clippings</a>
+  <a class="site-status" href="#site-notice">Research prototype</a>
+  <nav class="dh-nav" aria-label="Main">
+    <ul><li><button type="button" class="navbtn" popovertarget="about">About</button></li></ul>
+  </nav>
+</header>
+
+<main class="app" id="app">
+  <div class="intro">
+    <h1>Where were Stefan Zweig's press clippings published?</h1>
+    <div class="mode" role="radiogroup" aria-label="Show the references as">
+      <button type="button" role="radio" aria-checked="true" data-mode="catalogue"><span class="mode-k">Catalogue</span> one row per written string</button>
+      <button type="button" role="radio" aria-checked="false" data-mode="model"><span class="mode-k">Model</span> one row per periodical</button>
+    </div>
+  </div>
+
+  <p class="state" id="loading">Loading the references.</p>
+  <p class="state error" id="error" hidden>The references could not be loaded. Reload the page; if it was opened as a file, open it through a web server.</p>
+
+  <div class="work" id="work" hidden>
+    <figure class="figure" id="figure" tabindex="-1">
+      <svg id="chart" role="group" aria-label="Clippings by periodical and year. Each dot is one clipping."></svg>
+      <div class="tip" id="tip" role="tooltip" hidden></div>
+      <figcaption class="vh" id="chart-desc"></figcaption>
+    </figure>
+    <aside class="panel" id="panel" aria-label="Details" tabindex="-1"></aside>
+  </div>
+  <p class="vh" id="live" aria-live="polite"></p>
+</main>
+
+<div class="about" id="about" popover>
+  <button type="button" class="close" popovertarget="about" popovertargetaction="hide" aria-label="Close"><svg class="dh-icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+  <h2>About this instrument</h2>
+  <p>The Aufsatzablage of the Stefan Zweig estate in the Literaturarchiv Salzburg holds Zweig's own collection of press clippings. Its catalogue records where a piece appeared as one line of free text, for example <q>Neue Freie Presse, Wien, 3. 5. 1911, S. 2</q>. As text, the same newspaper can be written in several ways, and two newspapers can share a name.</p>
+  <p>This instrument reads every such line with a deterministic parser into periodical, place, date and page, then joins the lines into periodicals. Case, a leading article and the spelling Litteratur are ignored automatically; a few further joins are editorial decisions, each shown with its reason. Lines the parser cannot read, book references and clippings without a reference stay visible as their own group. Nothing is guessed and nothing has been checked against the facsimiles yet.</p>
+  <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The instrument was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
+</div>
+
+<footer class="dh-foot site-foot">
+  <div class="dh-foot__frame">
+    <p class="dh-foot__brand"><img src="assets/dhcraft/dhcraft-mark-watercolor-128.png" alt="" width="28" height="32"><span><strong>Zweig Press Clippings</strong><br>A tool by <a href="https://dhcraft.org">Digital Humanities Craft</a></span></p>
+    <nav class="dh-foot__links" aria-label="Project">
+      <a class="dh-icon-link" href="https://stefanzweig.digital"><svg class="dh-icon" aria-hidden="true"><use href="#i-ext"/></svg>Stefan Zweig Digital</a>
+      <a class="dh-icon-link" href="https://dhcraft.org/Promptotyping/"><svg class="dh-icon" aria-hidden="true"><use href="#i-ext"/></svg>Promptotyping</a>
+      <a class="dh-icon-link" href="https://dhcraft.org/imprint/"><svg class="dh-icon" aria-hidden="true"><use href="#i-info"/></svg>Imprint</a>
+    </nav>
+    <p class="site-notice" id="site-notice">Research prototype, built with coding agents following Promptotyping, not a maintained product. Parsed fields are machine-read and not verified; check a reference against its facsimile before reuse.</p>
+    <p class="dh-foot__licence">Text <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, code MIT, shared web files MIT, fonts OFL, DHCraft logo protected. Catalogue data Literaturarchiv Salzburg, <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>; facsimiles Literaturarchiv Salzburg, Stefan Zweig Digital, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
+  </div>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

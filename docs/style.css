@@ -1,0 +1,142 @@
+/* Zweig Press Clippings. The shared DHCraft header and footer come from assets/dhcraft (layer dh);
+   these unlayered rules lay out the one instrument and its colours. */
+
+:root {
+  /* City of publication. Colour is never the only carrier: every row names its place. */
+  --c-wien: light-dark(#a8501a, #f0a067);
+  --c-berlin: light-dark(#35629e, #8fb6ec);
+  --c-other: light-dark(#3f7a33, #93cf7f);
+  --c-unknown: light-dark(#7f8499, #9aa1b8);
+  --head-h: 3.6rem;
+  --panel-w: 24rem;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--dh-ground); }
+body { margin: 0; background: var(--dh-ground); color: var(--dh-ink); font: 400 var(--dh-step-0)/1.45 var(--dh-font-text); }
+[hidden] { display: none !important; }
+.vh { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+:focus-visible { outline: var(--dh-focus-ring); outline-offset: var(--dh-focus-offset); }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+.site-head { min-block-size: var(--head-h); padding-block: var(--dh-space-1); border-block-end: var(--dh-hairline) solid var(--dh-line); }
+.site-status { padding: 2px var(--dh-space-2); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-pill); font-size: var(--dh-step--1); color: var(--dh-ink-soft); text-decoration: none; white-space: nowrap; }
+.site-status:hover { color: var(--dh-ink); text-decoration: underline; }
+.site-head .dh-nav ul { justify-content: flex-end; }
+.navbtn { border: 0; background: none; padding: var(--dh-space-2) var(--dh-space-3); color: var(--dh-ink-soft); }
+.navbtn:hover, .navbtn:focus-visible { color: var(--dh-ink); text-decoration: underline; }
+
+/* One screen: title row, then figure and panel fill what is left of the viewport. */
+.app { display: flex; flex-direction: column; block-size: calc(100dvh - var(--head-h)); min-block-size: 30rem; padding: var(--dh-space-3) var(--dh-gutter) var(--dh-space-3); gap: var(--dh-space-3); }
+.intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--dh-space-2) var(--dh-space-5); }
+h1 { margin: 0; font: 700 var(--dh-step-2)/1.15 var(--dh-font-display); }
+
+.mode { display: inline-flex; border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-pill); padding: 3px; gap: 3px; }
+.mode button { border: 0; border-radius: var(--dh-radius-pill); background: none; padding: var(--dh-space-1) var(--dh-space-4); color: var(--dh-ink-soft); font-size: var(--dh-step--1); min-block-size: 2.4rem; }
+.mode .mode-k { display: block; font-size: var(--dh-step-0); font-weight: 600; color: var(--dh-ink); line-height: 1.2; }
+.mode button[aria-checked="true"] { background: var(--dh-accent); color: var(--dh-on-accent); }
+.mode button[aria-checked="true"] .mode-k { color: var(--dh-on-accent); }
+.mode button:not([aria-checked="true"]):hover { background: var(--dh-ground-alt); }
+
+.state { margin: 0; color: var(--dh-ink-soft); }
+.error { color: var(--dh-ink); border-inline-start: 3px solid var(--c-wien); padding-inline-start: var(--dh-space-3); }
+
+.work { flex: 1; min-block-size: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--panel-w); gap: var(--dh-space-5); }
+.figure { position: relative; margin: 0; min-block-size: 0; }
+.figure:focus { outline: none; }
+#chart { position: absolute; inset: 0 auto auto 0; display: block; overflow: visible; }
+
+/* Row labels are HTML buttons over the SVG, so they wrap, take focus and read as text. */
+.labels { position: absolute; inset: 0 auto 0 0; pointer-events: none; }
+.rowlabel { position: absolute; inset-inline-start: 0; display: flex; align-items: center; gap: var(--dh-space-2); padding: 0 var(--dh-space-2) 0 0; border: 0; background: none; text-align: start; pointer-events: auto; line-height: 1.1; color: var(--dh-ink); transition: opacity .25s, transform .5s; }
+.rowlabel:hover .rl-name, .rowlabel:focus-visible .rl-name { text-decoration: underline; }
+.rowlabel[aria-pressed="true"] .rl-name { color: var(--dh-accent); text-decoration: underline; text-decoration-thickness: 2px; }
+.rl-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-inline-size: 0; }
+.rl-place { flex: none; font-size: .85em; font-weight: 600; }
+.rl-icons { flex: none; display: inline-flex; gap: 2px; color: var(--dh-accent); }
+.rl-icons .dh-icon { inline-size: 1.05em; block-size: 1.05em; }
+.mode-catalogue .rl-name { font-family: var(--dh-font-mono); font-size: .82em; }
+.rowlabel.group .rl-name { color: var(--dh-ink-soft); font-style: italic; }
+.rowcount { position: absolute; inset-inline-end: 0; font-variant-numeric: tabular-nums; color: var(--dh-ink-soft); font-size: var(--dh-step--1); transition: transform .5s; }
+
+.axis text { fill: var(--dh-ink-soft); font: 400 13px var(--dh-font-text); }
+.axis line, .grid line { stroke: var(--dh-line); }
+.rowline { stroke: var(--dh-line); }
+.dot { transition: transform .6s cubic-bezier(.3,.7,.2,1), opacity .3s, fill .6s; cursor: pointer; stroke: var(--dh-ground); stroke-width: 1; }
+.dot.c-Wien { fill: var(--c-wien); }
+.dot.c-Berlin { fill: var(--c-berlin); }
+.dot.c-other { fill: var(--c-other); }
+.dot.c-unknown { fill: var(--c-unknown); }
+/* The catalogue does not know the city; colour appears only once the place is modelled. */
+.mode-catalogue .dot:not(.hollow) { fill: var(--dh-ink-soft); }
+.dot.hollow { fill: var(--dh-ground); stroke: var(--c-unknown); stroke-width: 1.6; }
+.dot.dim { opacity: .18; }
+.dot.sel { stroke: var(--dh-ink); stroke-width: 2.5; }
+.dot.kfocus { stroke: var(--dh-focus); stroke-width: 3; }
+.groupnote { fill: var(--dh-ink-soft); font: 400 13px var(--dh-font-text); }
+.c-text-Wien { color: var(--c-wien); }
+.c-text-Berlin { color: var(--c-berlin); }
+.c-text-other { color: var(--c-other); }
+.c-text-unknown { color: var(--c-unknown); }
+
+.tip { position: absolute; z-index: 5; max-inline-size: 22rem; padding: var(--dh-space-2) var(--dh-space-3); background: var(--dh-surface); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-s); box-shadow: 0 4px 16px rgb(0 0 0 / .12); font-size: var(--dh-step--1); pointer-events: none; }
+.tip code { font-family: var(--dh-font-mono); }
+
+/* Detail panel beside the figure */
+.panel { overflow-y: auto; min-block-size: 0; padding-inline-start: var(--dh-space-5); border-inline-start: var(--dh-hairline) solid var(--dh-line); font-size: var(--dh-step--1); }
+.panel:focus { outline: none; }
+.panel h2 { margin: 0 0 var(--dh-space-2); font: 600 var(--dh-step-1)/1.2 var(--dh-font-display); }
+.panel h2 .place { display: block; font: 600 var(--dh-step-0) var(--dh-font-text); }
+.panel p { margin: 0 0 var(--dh-space-3); }
+.panel .back { float: inline-end; border: 0; background: none; padding: var(--dh-space-1); color: var(--dh-ink-soft); }
+.panel .back:hover { color: var(--dh-ink); }
+.panel ul { list-style: none; margin: 0 0 var(--dh-space-4); padding: 0; }
+.panel li { padding-block: 3px; }
+.case { display: block; inline-size: 100%; text-align: start; border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-m); background: var(--dh-surface); padding: var(--dh-space-3); margin-block-end: var(--dh-space-3); }
+.case:hover { border-color: var(--dh-accent); }
+.case strong { display: block; font-family: var(--dh-font-display); font-size: var(--dh-step-0); }
+.str { font-family: var(--dh-font-mono); font-size: .95em; background: var(--dh-ground-alt); padding: 1px 4px; border-radius: 3px; }
+.n { font-variant-numeric: tabular-nums; color: var(--dh-ink-soft); }
+.decision { display: flex; gap: var(--dh-space-2); align-items: flex-start; }
+.decision .dh-icon { color: var(--dh-accent); margin-block-start: 2px; }
+.linkish { border: 0; background: none; padding: 0; color: var(--dh-link); text-align: start; }
+.linkish:hover, .linkish:focus-visible { text-decoration: underline; }
+.years { display: flex; flex-wrap: wrap; gap: 2px var(--dh-space-2); }
+.compare { display: grid; gap: var(--dh-space-2); margin-block-end: var(--dh-space-3); }
+.compare .k { color: var(--dh-ink-soft); font-size: .9em; }
+.model-line { font-size: var(--dh-step-0); }
+.facs { margin: 0 0 var(--dh-space-3); }
+.facs img { display: block; max-inline-size: 100%; max-block-size: 18rem; inline-size: auto; border: 1px solid var(--dh-line); background: var(--dh-ground-alt); }
+.facs figcaption { color: var(--dh-ink-soft); font-size: .9em; margin-block-start: 2px; }
+.status { display: inline-block; padding: 0 var(--dh-space-2); border: 1px dashed var(--dh-line-strong); border-radius: var(--dh-radius-pill); color: var(--dh-ink-soft); }
+.panel a { color: var(--dh-link); }
+
+.about { max-inline-size: min(40rem, 92vw); padding: var(--dh-space-5); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-m); background: var(--dh-surface); color: var(--dh-ink); }
+.about::backdrop { background: rgb(0 0 0 / .3); }
+.about h2 { margin-block-start: 0; font: 600 var(--dh-step-1) var(--dh-font-display); }
+.about .close { float: inline-end; border: 0; background: none; color: var(--dh-ink-soft); }
+
+.site-foot .site-notice { grid-column: 1 / -1; max-inline-size: 80ch; }
+
+@media (max-width: 900px) {
+  :root { --panel-w: 100%; }
+  .app { block-size: auto; }
+  .work { grid-template-columns: minmax(0, 1fr); }
+  .figure { block-size: auto; }
+  .panel { padding: var(--dh-space-4) 0 0; border-inline-start: 0; border-block-start: var(--dh-hairline) solid var(--dh-line); }
+  .mode button { padding-inline: var(--dh-space-3); }
+}
+#chart.instant .dot { transition: none; }
+/* On a phone the status stays in the footer notice; the header keeps brand and About on one line. */
+@media (max-width: 480px) { .site-status { display: none; } }
+@media (max-width: 767px) {
+  .site-head { flex-wrap: nowrap; gap: var(--dh-space-2); }
+  .site-head .dh-nav { flex-basis: auto; }
+  .dh-brand { font-size: var(--dh-step-0); white-space: nowrap; }
+  .site-head .dh-nav { flex: none; margin-inline-start: auto; }
+  .dh-brand img { block-size: 1.6rem; }
+  .mode button { font-size: .8rem; line-height: 1.2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot, .rowlabel, .rowcount { transition: none; }
+}
