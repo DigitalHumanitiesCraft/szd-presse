@@ -1,6 +1,6 @@
 ---
 title: Zweig Press Clippings
-project: {name: szd-presse, repository: local, not yet published}
+project: {name: szd-presse, repository: https://github.com/DigitalHumanitiesCraft/szd-presse}
 method: {name: Promptotyping, url: https://dhcraft.org/Promptotyping/}
 status: draft
 language: en
@@ -14,6 +14,8 @@ template: project
 # Zweig Press Clippings
 
 One instrument that shows what modelling does to a source collection. The press clippings of the Aufsatzablage in the Stefan Zweig estate carry their place of publication as one free-text line per catalogue record; the instrument shows the same clippings once grouped by those strings and once grouped by periodicals modelled with place and date.
+
+Published on 2026-11-15 at https://dhcraft.org/szd-presse/, source at https://github.com/DigitalHumanitiesCraft/szd-presse.
 
 ## Data basis
 

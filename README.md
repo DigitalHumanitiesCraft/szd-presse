@@ -2,6 +2,11 @@
 
 A research tool that carries catalogue data into a modelled schema. Stefan Zweig kept a collection of press clippings, catalogued by the Literaturarchiv Salzburg with one line of free text for where each piece appeared. In the view Normalise, stated rules propose how these lines join into periodicals with place and date; the cases a text cannot decide come first, every join, inference and line left unread is shown, and a deep-zoom viewer fed by the archive's IIIF service puts the facsimile beside the proposal. The view Explore shows the modelled clippings by periodical and year. The modelled data and a register of the periodicals can be downloaded; every statement in them is a proposal by rule until a person confirms it.
 
+## Addresses
+
+- Published tool: https://dhcraft.org/szd-presse/ (GitHub Pages from `main`, folder `docs/`)
+- Repository: https://github.com/DigitalHumanitiesCraft/szd-presse
+
 ## Run locally
 
 ```bash
@@ -18,6 +23,7 @@ python scripts/model.py data/records.json data/aliases.json docs/img docs/data/c
 python scripts/export.py docs/data/clippings.json docs/data/export
 python -m pytest tests
 node tests/ui/keyboard.cjs   # browser checks against the local server, needs Playwright
+BASE=https://dhcraft.org/szd-presse/ node tests/ui/viewer.cjs   # the same checks against the published page
 ```
 
 `scripts/candidates.py` proposes possible same periodicals by stated criteria without joining them; the export writes them to `docs/data/export/candidates-same-periodical.*`.

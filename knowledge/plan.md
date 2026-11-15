@@ -1,6 +1,6 @@
 ---
 title: Plan for the modelling tool after 16 November 2026
-project: {name: szd-presse, repository: local, not yet published}
+project: {name: szd-presse, repository: https://github.com/DigitalHumanitiesCraft/szd-presse}
 method: {name: Promptotyping, url: https://dhcraft.org/Promptotyping/}
 status: draft
 language: en

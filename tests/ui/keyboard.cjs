@@ -4,12 +4,14 @@
 // Every step prints PASS or FAIL with its expected result in the step name.
 // Keyboard path and zoom for the Normalise / Explore frame. Expected results stand in each step name.
 const { chromium } = require('playwright');
+// Base address of the served site; set BASE to test the published page instead of the local server.
+const BASE = process.env.BASE || 'http://127.0.0.1:8731/';
 const out = process.argv[2] || require('node:os').tmpdir();
 const log = (step, ok, note = '') => console.log(`${ok ? 'PASS' : 'FAIL'} ${step}${note ? ' :: ' + note : ''}`);
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  await page.goto('http://127.0.0.1:8731/');
+  await page.goto(BASE);
   await page.waitForSelector('#work:not([hidden])');
   const act = () => page.evaluate(() => { const a = document.activeElement; return (a.className?.baseVal ?? a.className) + '|' + (a.getAttribute('aria-label') || a.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40); });
   const order = [];
@@ -83,7 +85,7 @@ const log = (step, ok, note = '') => console.log(`${ok ? 'PASS' : 'FAIL'} ${step
 
   for (const view of ['', '#explore']) {
     const z = await browser.newPage({ viewport: { width: 640, height: 360 }, deviceScaleFactor: 2 });
-    await z.goto('http://127.0.0.1:8731/' + view);
+    await z.goto(BASE + view);
     await z.waitForSelector('#work:not([hidden])');
     await z.waitForTimeout(200);
     const r = await z.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);

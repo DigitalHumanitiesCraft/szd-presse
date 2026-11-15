@@ -2,10 +2,12 @@
 // for the online part, network access to gams.uni-graz.at; the offline part blocks it on purpose.
 // Viewer checks: online through GAMS IIIF, offline with GAMS blocked, keyboard and focus.
 const { chromium } = require('playwright');
+// Base address of the served site; set BASE to test the published page instead of the local server.
+const BASE = process.env.BASE || 'http://127.0.0.1:8731/';
 const out = process.argv[2] || require('node:os').tmpdir();
 const log = (s, ok, n = '') => console.log(`${ok ? 'PASS' : 'FAIL'} ${s}${n ? ' :: ' + n : ''}`);
 async function openFz(p) {
-  await p.goto('http://127.0.0.1:8731/');
+  await p.goto(BASE);
   await p.waitForSelector('#work:not([hidden])');
   await p.click('.prop[data-entity^="frankfurter zeitung|"]');
   await p.click('.thumb >> nth=1');

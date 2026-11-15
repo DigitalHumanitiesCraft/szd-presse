@@ -1,6 +1,6 @@
 ---
 title: Journal of Zweig Press Clippings
-project: {name: szd-presse, repository: local, not yet published}
+project: {name: szd-presse, repository: https://github.com/DigitalHumanitiesCraft/szd-presse}
 method: {name: Promptotyping, url: https://dhcraft.org/Promptotyping/}
 status: active
 language: en
@@ -14,14 +14,23 @@ template: journal
 
 ## Open
 
-- Publication: released by the operator after his acceptance (relayed by the Research Coordination). Creating the public repository and switching on Pages are steps he carries out himself under his standing instructions; the footer link to https://github.com/DigitalHumanitiesCraft/szd-presse is in place for that address.
-- Licence conflict to confirm: the TEI catalogue says CC BY-NC 4.0, the stefanzweig.digital imprint says all content CC BY 4.0. The site follows each statement for its own material (catalogue-derived data BY-NC, facsimiles BY). The facsimiles reproduce printed texts of third parties, whose rights the archive's statement may not cover.
-- No parsed field and no join has been checked against the facsimiles. Status of all of them: proposal (agent, 2026-11-15).
-- The rebuilt frame has not been seen by the operator. The columns variant from the GOSSIP role field is off the table for the talk and may return as its own idea.
-- Plan for the mask and the decisions is in plan.md; nothing of it is built.
-- Model mode was not measured by the density check, which reads the entry state only.
+- Nothing has been checked against the facsimiles by a person. Every parsed field, join, alias, inference and candidate is a proposal by rule (agent, 2026-11-15). The data review observed, as an inference, that the catalogue lines look transcribed from the handwritten notes and the clipping agencies' slips, so a check at the facsimile tests that transcription.
+- Two rights points, released by the operator as open: the catalogue data and everything derived from them stand under CC BY-NC 4.0 per the TEI header, unlike the CC BY 4.0 of the stefanzweig.digital imprint; the clippings print texts by third parties whose rights the archive's CC BY statement may not cover. Both are stated in README and About.
+- Remarks of the last fresh reader, not yet acted on: city rows in "Group by city" do not look clickable, and the purple of the active "Group by city" resembles the view switch, so it is unclear whether it is a mode or a filter. The side panel's case counts stay counts of the whole collection under a filter, which a reader took for unresponsive filters.
+- Stage 2 parts left for after the talk, by decision of the Research Coordination: evidence per decision with the number of clippings it affects; row structure for throughput (next and previous keys, the panel staying open, selectable catalogue lines).
+- The mask with decisions (confirm, reject, doubt, change, by a named person) is planned in plan.md and not built; also authority data (GND via lobid-gnd; no ZDB reconciliation service found) and rules and groupings as data.
+- Not decided: a name for the tool as such; the page keeps "Zweig Press Clippings". Moving shared rules into brand-assets needs the operator's word.
+- Pushes to the public repository need the operator's word through the Research Coordination; documentation commits that change nothing served may be pushed as a fast-forward.
 
 ## Entries
+
+### 2026-11-15 Published
+
+- Trigger: the operator accepted the tool after stage 2 and released the publication, both answers given directly to the Research Coordination ("ja, veröffentlichen und mit der Ortsansicht auf Folie 3"; earlier "ja" to creating a public repository under DigitalHumanitiesCraft and switching on Pages).
+- Done here: the checks before publication (tests, keyboard and viewer scripts, a last fresh reader, the check of the whole repository and its history for private material, licences, rights points in README and About, footer link to the source). This session did not create the repository: the operator's standing instructions keep repository visibility and publishing on his accounts with him, and a consent passed on by another session is no release here.
+- Carried out by the Research Coordination in its own session, with the operator's answers given there: public repository https://github.com/DigitalHumanitiesCraft/szd-presse from commit b736078, Pages from `main` `/docs`, served at https://dhcraft.org/szd-presse/ (custom domain of the organisation).
+- Checked here against the live address: keyboard script 22 of 22 and viewer script 6 of 6 with `BASE=https://dhcraft.org/szd-presse/`, a facsimile opened in the viewer from the live IIIF service, no request over http (no mixed content), every footer link and all six downloads under Data answer 200, `knowledge/`, `README.md`, `tests/`, `scripts/`, `slide/` and the source TEI answer 404. No difference from the local state; the only console messages were WebGL performance notes of the headless browser.
+- Changed: tests/ui/keyboard.cjs and viewer.cjs take a base address (BASE), README and project.md name both addresses.
 
 ### 2026-11-15 Stage 2: possible same periodicals, place and year
 
