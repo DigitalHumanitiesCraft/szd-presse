@@ -23,6 +23,13 @@ template: journal
 
 ## Entries
 
+### 2026-11-15 Deep-zoom viewer from the archive's IIIF service
+
+- Trigger: the operator asked for IIIF and an IIIF-capable OpenSeadragon so that an expert can read the clipping while deciding.
+- Found: GAMS does serve IIIF (Image API 2 level 2 and a manifest per object, CORS open); the Phase 1 report "no IIIF found" was incomplete because that path had not been tried. The info.json lacks tiles and has an empty sizes list, which made OpenSeadragon fail.
+- Decided: viewer over the stage with the panel (catalogue line, parsed fields, status) beside it; pages from the manifest; local reduced image as placeholder and fallback; OpenSeadragon 6.0.2 copied from szd-digital-edition, loaded only on first open; hotlinking recorded as a deliberate choice in data.md.
+- Evidence: Playwright: IIIF pages load (Frankfurter Zeitung, 25 March 1911, seven pages), paging, zoom, Escape returns focus, page does not scroll, no page errors; with GAMS blocked the local image and a note appear.
+
 ### 2026-11-15 Case names in the side panel, facsimile previews in the list
 
 - Trigger: the operator's answer „ja, Namen ins Panel und Faksimile-Vorschau in die Liste“, and the Research Coordination's decision to split the decision group.
