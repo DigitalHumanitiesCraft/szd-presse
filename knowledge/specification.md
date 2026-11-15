@@ -16,7 +16,7 @@ What the instrument does and under which constraints it was built.
 
 ## Requirements
 
-- A research tool that carries catalogue data into a modelled schema, in two parts on one dataset and one figure: Model (rows are the catalogue lines with the rules' proposals, the place where joins are decided) and Explore (rows are the modelled periodicals by year). The same marks move between the two parts. Deciding in the mask (confirm, reject, change, by a named person) is planned in [plan.md](plan.md), not built.
+- A research tool that carries catalogue data into a modelled schema, in two views on one dataset: Normalise, a list of the rules' proposals with one row per proposed periodical and the catalogue forms it joins, grouped as needs a decision (split title, inferred place, editorial alias, line not parsed), joined by rule, set aside by rule, unchanged; and Explore, the modelled clippings by periodical and year, fitted to the viewport. A rail on the left is legend and filter for both; a detail panel opens on a selection and closes again. Deciding in the mask (confirm, reject, change, by a named person) is planned in [plan.md](plan.md), not built.
 - The output is the product: `docs/data/export/` holds the modelled clippings and a register of periodicals as CSV and JSON, with licence, written by `scripts/export.py`; the Data menu offers them.
 - Every mark shows its status. Today every statement is a proposal by rule; the key carries the confirmed state (ringed mark) with "none yet".
 - Every number on the page is computed from the data by code; `tests/test_model.py` fails when parser or joins change the counts.
@@ -31,9 +31,10 @@ Historians who plan an edition of periodicals and organisational records across 
 
 ## Range of functions
 
-- Part switch Model and Explore, animated unless reduced motion is requested.
+- View switch Normalise and Explore in the header; the address `#explore` opens Explore directly.
+- Rail filter by place or kind of case, marked when active, with a reset.
 - Data menu with the four downloads and their licence.
-- Two prepared cases in the side panel: Frankfurter Zeitung (four place forms, one newspaper) and Der Morgen (one title, two periodicals).
+- The two prepared cases stand where they belong: Der Morgen first in "needs a decision" and behind the rail entry "title split"; the Frankfurter Zeitung row shows its four catalogue forms without a click.
 - Row panel, item panel with facsimile, remainder list of all further periodicals, not-read list.
 - Arrow keys move over the dots, Enter opens, Escape returns to the overview.
 

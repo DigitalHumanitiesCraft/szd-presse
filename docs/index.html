@@ -20,6 +20,7 @@
   <symbol id="i-unread" viewBox="0 0 24 24"><path d="M4 6h16M4 12h9M4 18h12"/><path d="m16 14 5 5M21 14l-5 5"/></symbol>
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></symbol>
   <symbol id="i-none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 16 16 8"/></symbol>
+  <symbol id="i-alias" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 </svg>
 <a class="dh-skip" href="#stage">Skip to the figure</a>
@@ -68,7 +69,7 @@
   <h2>About this tool</h2>
   <p>The Aufsatzablage of the Stefan Zweig estate in the Literaturarchiv Salzburg holds Zweig's own collection of press clippings. Its catalogue records where a piece appeared as one line of free text, for example <q>Neue Freie Presse, Wien, 3. 5. 1911, S. 2</q>. As text, the same newspaper can be written in several ways, and two newspapers can share a name.</p>
   <p>This tool reads every such line with a deterministic parser into periodical, place, date and page, then joins the lines into periodicals. Case, a leading article and the spelling Litteratur are ignored automatically; a few further joins are editorial decisions, each shown with its reason. Lines the parser cannot read, book references and clippings without a reference stay visible as their own group. Nothing is guessed. Every join is a proposal by rule until a person confirms it; deciding in the tool is the next step of its development. The modelled data can be downloaded under Data.</p>
-  <p>Normalise lists the rules' proposals, one row per proposed periodical with the catalogue forms it joins and their counts. The first group holds what needs an expert: a title split by place, a place inferred from other lines, an editorial alias, a line the parser could not read. Explore shows the modelled clippings by periodical and year. The rail on the left is legend and filter for both; a selected entry filters both views.</p>
+  <p>Normalise lists the rules' proposals, one row per proposed periodical with the catalogue forms it joins and their counts. The first group holds what needs an expert, marked by a sign in the row: a title split by place (fork), a place inferred from other lines (pin), an editorial alias (pen), and the lines the parser could not read. The rail counts clippings; a clipping with several kinds of case counts under each. Explore shows the modelled clippings by periodical and year. The rail on the left is legend and filter for both; a selected entry filters both views.</p>
   <p>Data: catalogue of the Aufsatzablage, Stefan Zweig Digital, Literaturarchiv Salzburg (TEI, CC BY-NC 4.0). Facsimiles: Literaturarchiv Salzburg, Stefan Zweig Digital, CC BY 4.0, reduced in size. The tool was built with coding agents following Promptotyping by Digital Humanities Craft.</p>
 </div>
 

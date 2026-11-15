@@ -17,11 +17,19 @@ template: journal
 - Publication waits for the operator's word: creating a public GitHub repository, setting the remote and switching on Pages (folder `docs/` on `main`). Until then the footer has no source-code link; add it when the repository exists.
 - Licence conflict to confirm: the TEI catalogue says CC BY-NC 4.0, the stefanzweig.digital imprint says all content CC BY 4.0. The site follows each statement for its own material (catalogue-derived data BY-NC, facsimiles BY). The facsimiles reproduce printed texts of third parties, whose rights the archive's statement may not cover.
 - No parsed field and no join has been checked against the facsimiles. Status of all of them: proposal (agent, 2026-11-15).
-- Not seen by the operator on screen yet. The columns variant from the GOSSIP role field is off the table for the talk and may return as its own idea.
+- The rebuilt frame has not been seen by the operator. The columns variant from the GOSSIP role field is off the table for the talk and may return as its own idea.
 - Plan for the mask and the decisions is in plan.md; nothing of it is built.
 - Model mode was not measured by the density check, which reads the entry state only.
 
 ## Entries
+
+### 2026-11-15 Frame rebuilt after the operator's rejection
+
+- Trigger: the operator rejected the Model state on his screen ("wieder die gleichen User-Interface-Probleme"); the Research Coordination's analysis named unused space, four levels before the data, colour without meaning in Model, a timeline that played no part in joining, small type, hidden affordances and explanatory text.
+- Decided: one header row; rail as legend and filter; closing panel; Normalise as a list of proposals grouped by what needs an expert first (stated criterion: split title, inferred place, editorial alias, line not parsed); Explore fitted to the viewport; no explanatory paragraph on the page.
+- Rejected: a sparkline per row (time; legibility first).
+- Found: the first rebuild failed the density check in both views and both widths (boxed rows, two-node chips, rail before the stage in reading order); rows lost their boxes, chips became one node, case kinds became icons with tooltips in the rail, the loose lanes lost their duplicate counts, the rail moved after the stage in the DOM.
+- Evidence: density passes in Normalise and Explore at 1280 and 360; keyboard script 18 of 18; 200 per cent zoom without horizontal scroll in both views; 17 tests.
 
 ### 2026-11-15 Reframed as a modelling tool with two parts and an output
 

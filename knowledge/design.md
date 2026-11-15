@@ -41,6 +41,12 @@ A specialised instrument for one question, made to be read from the back of a ro
 
 `tools/check_ui_density.cjs` (copied unchanged from `pruefansicht`), profile `work`, entry view: wide passes at the limits for text styles and text elements; narrow passes.
 
+## Frame of 2026-11-15, after the operator's rejection
+
+One header row (brand, status pill, switch Normalise and Explore with tooltips, Data, About), no page heading. Rail on the left, legend and filter at once: places with names and counts, kinds of case as icons with counts and tooltips. Stage at full width; the detail panel appears only while something is selected. Normalise rows are separated by hairlines, without boxes; the catalogue forms stand in the monospace with their counts. Explore sizes rows, marks and labels from the stage, so all rows and the three remainder lanes fit at 1280 x 720, 1024 x 768 and 1620 x 920. The footer stays below the tool and is reached by scrolling the page; the tool itself does not scroll.
+
+Density check, profile `work`, measured in both views: Normalise wide 67 text elements, narrow 34; Explore wide 70, narrow 18; all within limits.
+
 ## Status in the marks
 
 Filled mark: proposal by rule. Ringed mark (filled with an outer ring): confirmed by a person; none exist yet, the key says so. Dashed outline: not placed (book reference, line not parsed, no publication line). Selection: accent ring. The three must never share a form.
@@ -49,3 +55,4 @@ Filled mark: proposal by rule. Ringed mark (filled with an outer ring): confirme
 
 - 2026-11-15, relayed by the Research Coordination, verbatim: „Dann würden wir diesen Prototypen gleich auf die erste Folie nach der Vorstellung von mir und DHCraft als Screenshot und mit einem GitHub Pages Link zu einem fertigen Tool. Und das muss wie das GOSSIP Tool oder CorrespExplorer sein? Eben nur spezialisiert und innovativ und fertig ausgebaut“. Maps to yardstick rule 31 (family header and footer). Status: addressed in the first build, not yet seen by the operator.
 - 2026-11-15, relayed by the Research Coordination, verbatim: „Man möchte nicht vor und nach dem Modellieren haben, sondern man möchte eigentlich ein Werkzeug haben, um die Daten in das modellierte Schema zu überführen. damit ich da mit den modellierten Daten arbeiten kann“ and „Das heißt, wir haben ein Tool mit zwei Ansichten: einer Dateneingabeansicht und einer Ansicht zur Analyse.“ Maps to yardstick rule 39 (views by the subject people work with). Status: reframed as Model and Explore with export in this build; the mask with decisions is planned in plan.md.
+- 2026-11-15, relayed by the Research Coordination, verbatim: „Also, wir haben wieder die gleichen User-Interface-Probleme. Analysiere mal selber kritisch, was das alles ist, und erzeuge das verbesserte User Interface.“ Maps to yardstick rules 14, 22, 28, 35, 41 and to the section on surfaces in Operator-Wissen. Status: rebuilt in commit 588c4f2 and after; not yet seen by the operator.

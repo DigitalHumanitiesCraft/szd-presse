@@ -121,7 +121,8 @@ function renderNormalise() {
   const sel = state.selected;
   const entRow = (e) => {
     const on = sel?.type === "entity" && sel.id === e.id;
-    const marks = [e.split && icon("split", "title split"), e.items.some((it) => it.kinds.has("infer")) && icon("infer", "place inferred")].filter(Boolean).join("");
+    const alias = e.items.some((it) => it.decisions.some((d) => d.kind === "alias"));
+    const marks = [e.split && icon("split", "title split"), e.items.some((it) => it.kinds.has("infer")) && icon("infer", "place inferred"), alias && icon("alias", "editorial alias")].filter(Boolean).join("");
     return `<li><button type="button" class="prop${on ? " on" : ""}" aria-pressed="${on}" data-entity="${esc(e.id)}">
       <span class="prop-head"><span class="sw c-${e.city}" aria-hidden="true"></span><span class="prop-name">${esc(e.label)}</span> <span class="prop-place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span>${marks ? `<span class="prop-icons">${marks}</span>` : ""}<span class="prop-n">${e.count}</span></span>
       <span class="chips">${e.forms.map(([f, n]) => `<code class="chip">${esc(f)}  ${n}</code>`).join("")}</span>
@@ -170,7 +171,7 @@ function measure() {
   const height = fig.clientHeight;
   const narrow = width < 600;
   // Titles keep at least about 250 px, also when the detail panel narrows the figure.
-  const labelW = narrow ? width * 0.46 : Math.min(420, Math.max(250, width * 0.35));
+  const labelW = narrow ? width * 0.46 : Math.min(420, Math.max(300, width * 0.35));
   const countW = narrow ? 30 : 46;
   return { width, height, narrow, axisH: 28, labelW, countW, x0: labelW + 10, x1: width - countW - 8 };
 }
@@ -365,13 +366,13 @@ function openEntity(id, trigger) {
   const also = e.split ? data.entities.filter((x) => x.split && x.label === e.label && x.id !== id) : [];
   openPanel({ type: "entity", id, also: [] }, `
     <h2>${esc(e.label)}<span class="place c-text-${e.city}">${esc(e.place ?? "place unknown")}</span></h2>
-    <p class="k">Catalogue lines joined</p>
+    <p class="k">${e.forms.length > 1 ? "Catalogue lines joined" : "Catalogue line"}</p>
     <ul class="forms">${e.forms.map(([f, n]) => `<li><code>${esc(f)}</code> <span class="n">${n}</span></li>`).join("")}</ul>
     ${folded ? `<p class="decision">${icon("merge")}<span>Rule: ${esc(data.foldRule)}.</span></p>` : ""}
     ${[...decisions.values()].map((d) => `<p class="decision">${icon(d.kind === "alias" ? "merge" : d.kind)}<span>${esc(d.text)}</span></p>`).join("")}
     ${also.map((s) => `<p class="decision">${icon("split")}<span>The other periodical of this title: <button type="button" class="linkish" data-entity="${esc(s.id)}">${esc(s.label)}, ${esc(s.place)}</button></span></p>`).join("")}
-    <p class="k">Clippings</p>
-    <div class="years">${items.map((it) => `<button type="button" class="linkish" data-pid="${esc(it.pid)}">${esc(dateText(it.date))}</button>`).join("")}</div>
+    <p class="k">Clippings, with their facsimiles as evidence</p>
+    <div class="thumbs">${items.map((it) => `<button type="button" class="thumb" data-pid="${esc(it.pid)}">${it.image ? `<img src="img/${esc(it.pid.replace(":", "_"))}.jpg" alt="" loading="lazy">` : ""}<span>${esc(dateText(it.date))}</span></button>`).join("")}</div>
   `, trigger);
 }
 
