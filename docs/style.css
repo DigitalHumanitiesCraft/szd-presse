@@ -29,8 +29,9 @@ code { font-family: var(--dh-font-mono); }
 .navbtn { border: 0; background: none; padding: var(--dh-space-2) var(--dh-space-3); color: var(--dh-ink-soft); }
 .navbtn:hover, .navbtn:focus-visible { color: var(--dh-ink); text-decoration: underline; }
 
-.mode { display: inline-flex; margin-inline-start: var(--dh-space-4); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-pill); padding: 3px; gap: 3px; }
-.mode button { position: relative; border: 0; border-radius: var(--dh-radius-pill); background: none; padding: var(--dh-space-1) var(--dh-space-5); font-weight: 600; color: var(--dh-ink); min-block-size: 2.4rem; }
+/* A small segmented switch inside the header row. */
+.mode { display: inline-flex; margin-inline-start: var(--dh-space-2); border: 1px solid var(--dh-line-strong); border-radius: var(--dh-radius-pill); padding: 2px; gap: 2px; }
+.mode button { position: relative; border: 0; border-radius: var(--dh-radius-pill); background: none; padding: 2px var(--dh-space-3); font-size: var(--dh-step--1); font-weight: 600; color: var(--dh-ink); min-block-size: 1.9rem; }
 .mode button[aria-checked="true"] { background: var(--dh-accent); color: var(--dh-on-accent); }
 .mode button:not([aria-checked="true"]):hover { background: var(--dh-ground-alt); }
 
